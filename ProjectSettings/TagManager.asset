@@ -42,3 +42,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Landscape
+    uniqueID: 2919818217
+    locked: 0
+  - name: Player
+    uniqueID: 479896863
+    locked: 0
