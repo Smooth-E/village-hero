@@ -4,33 +4,25 @@ using UnityEngine.InputSystem;
 public class CharacterMover : MonoBehaviour
 {
 
+    private readonly float _jumpForce = 30f;
+    private readonly float _moveSpeed = 10f;
+
     [SerializeField] private Rigidbody2D _rigidbody;
     [SerializeField] private CharacterGrounder _grounder;
-    [SerializeField] private float _jumpForce = 30f;
-    [SerializeField] private float _moveSpeed = 10f;
-
-    private PlayerControls.PlayerActions _controls;
-
-    private void Start()
+    
+    private float _horizontalVelocity = 0;
+    public float HorizontalVelocity 
     {
-        Debug.Log("Hello!");
-        _controls = new PlayerControls().Player;
-        _controls.Enable();
-        _controls.Jump.performed += Jump;
+        set => _horizontalVelocity = Mathf.Max(-1, Mathf.Min(value, 1));
+        get => _horizontalVelocity;
     }
 
-    private void FixedUpdate()
-    {
-        var velocity = new Vector2(_controls.Walk.ReadValue<float>() * _moveSpeed, _rigidbody.velocity.y);
-        _rigidbody.velocity = velocity;
-    }
-
-    private void OnDestroy() =>
-        _controls.Jump.performed -= Jump;
+    private void Update() =>
+        _rigidbody.velocity = new Vector2(_horizontalVelocity * _moveSpeed, _rigidbody.velocity.y);
 
     public void Jump(InputAction.CallbackContext context)
     {
-        if (_grounder.Grounded)
+        if (_grounder.IsGrounded)
             _rigidbody.AddForce(new Vector2(0, _jumpForce), ForceMode2D.Impulse);
     }
 

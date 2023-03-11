@@ -1,4 +1,4 @@
-public enum PathFindingRule
+public enum PathFindingAction
 {
     FallFromEdge,
     JumpAnywhere,
