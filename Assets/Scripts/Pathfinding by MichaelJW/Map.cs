@@ -9,7 +9,7 @@ public partial class Map : MonoBehaviour
 	/// <summary>
 	/// The map's position in world space. Bottom left corner.
 	/// </summary>
-	public Vector3 position;
+	public Vector3 BottomLeftCorner;
 	
 	/// <summary>
 	/// The base tile sprite prefab that populates the map.
@@ -50,12 +50,12 @@ public partial class Map : MonoBehaviour
 	/// <summary>
 	/// The width of the map in tiles.
 	/// </summary>
-	public int mWidth = 50;
+	public int Width = 50;
 
 	/// <summary>
 	/// The height of the map in tiles.
 	/// </summary>
-	public int mHeight = 42;
+	public int Height = 42;
 
     public MapRoomData mapRoomSimple;
     public MapRoomData mapRoomOneWay;
@@ -77,7 +77,7 @@ public partial class Map : MonoBehaviour
     public RectTransform sliderLow;
 
     private bool IsTileOutsideOfGrid(int x, int y) =>
-        x < 0 || x >= mWidth || y < 0 || y >= mHeight;
+        x < 0 || x >= Width || y < 0 || y >= Height;
 
 	public TileType GetTile(int x, int y) =>
         IsTileOutsideOfGrid(x, y) ? TileType.Block : tiles[x, y];
@@ -111,26 +111,26 @@ public partial class Map : MonoBehaviour
 	
 	public void GetMapTileAtPoint(Vector2 point, out int tileIndexX, out int tileIndexY)
 	{
-		tileIndexY =(int)((point.y - position.y + cTileSize/2.0f)/(float)(cTileSize));
-		tileIndexX =(int)((point.x - position.x + cTileSize/2.0f)/(float)(cTileSize));
+		tileIndexY =(int)((point.y - BottomLeftCorner.y + cTileSize/2.0f)/(float)(cTileSize));
+		tileIndexX =(int)((point.x - BottomLeftCorner.x + cTileSize/2.0f)/(float)(cTileSize));
 	}
 	
 	public Vector2Int GetMapTileAtPoint(Vector2 point) =>
 	    new Vector2Int(
-            (int) ((point.x - position.x + cTileSize/ 2f) / (float) cTileSize),
-            (int) ((point.y - position.y + cTileSize/ 2f) / (float) cTileSize)
+            (int) ((point.x - BottomLeftCorner.x + cTileSize/ 2f) / (float) cTileSize),
+            (int) ((point.y - BottomLeftCorner.y + cTileSize/ 2f) / (float) cTileSize)
         );
 	
 	public Vector2 GetMapTilePosition(int tileIndexX, int tileIndexY) =>
         new Vector2(
-				(float) (tileIndexX * cTileSize) + position.x,
-				(float) (tileIndexY * cTileSize) + position.y
+				(float) (tileIndexX * cTileSize) + BottomLeftCorner.x,
+				(float) (tileIndexY * cTileSize) + BottomLeftCorner.y
 			);
 
 	public Vector2 GetMapTilePosition(Vector2Int tileCoords) =>
         new Vector2(
-			(float) (tileCoords.x * cTileSize) + position.x,
-			(float) (tileCoords.y * cTileSize) + position.y
+			(float) (tileCoords.x * cTileSize) + BottomLeftCorner.x,
+			(float) (tileCoords.y * cTileSize) + BottomLeftCorner.y
 			);
 	
 	public bool CollidesWithMapTile(AxisAlignedBoundedBox aabb, int tileIndexX, int tileIndexY)
@@ -210,7 +210,7 @@ public partial class Map : MonoBehaviour
 
     public void SetTile(int x, int y, TileType type)
     {
-        if (x <= 1 || x >= mWidth - 2 || y <= 1 || y >= mHeight - 2)
+        if (x <= 1 || x >= Width - 2 || y <= 1 || y >= Height - 2)
             return;
 
         tiles[x, y] = type;
@@ -251,51 +251,51 @@ public partial class Map : MonoBehaviour
         prevInputs = new bool[(int)KeyInput.Count];
 
         //set the position
-        position = transform.position;
+        BottomLeftCorner = transform.position;
 
-        mWidth = mapRoom.width;
-        mHeight = mapRoom.height;
+        Width = mapRoom.width;
+        Height = mapRoom.height;
 
-        tiles = new TileType[mWidth, mHeight];
+        tiles = new TileType[Width, Height];
         tilesSprites = new SpriteRenderer[mapRoom.width, mapRoom.height];
 
-        mGrid = new byte[Mathf.NextPowerOfTwo(mWidth), Mathf.NextPowerOfTwo(mHeight)];
+        mGrid = new byte[Mathf.NextPowerOfTwo(Width), Mathf.NextPowerOfTwo(Height)];
         InitPathFinder();
 
         Camera.main.orthographicSize = Camera.main.pixelHeight / 2;
 
-        for (int y = 0; y < mHeight; ++y)
+        for (int y = 0; y < Height; ++y)
         {
-            for (int x = 0; x < mWidth; ++x)
+            for (int x = 0; x < Width; ++x)
             {
                 tilesSprites[x, y] = Instantiate<SpriteRenderer>(tilePrefab);
                 tilesSprites[x, y].transform.parent = transform;
-                tilesSprites[x, y].transform.position = position + new Vector3(cTileSize * x, cTileSize * y, 10.0f);
+                tilesSprites[x, y].transform.position = BottomLeftCorner + new Vector3(cTileSize * x, cTileSize * y, 10.0f);
 
-                if (mapRoom.tileData[y * mWidth + x] == TileType.Empty)
+                if (mapRoom.tileData[y * Width + x] == TileType.Empty)
                     SetTile(x, y, TileType.Empty);
-                else if (mapRoom.tileData[y * mWidth + x] == TileType.Block)
+                else if (mapRoom.tileData[y * Width + x] == TileType.Block)
                     SetTile(x, y, TileType.Block);
                 else
                     SetTile(x, y, TileType.OneWay);
             }
         }
 
-        for (int y = 0; y < mHeight; ++y)
+        for (int y = 0; y < Height; ++y)
         {
             tiles[1, y] = TileType.Block;
-            tiles[mWidth - 2, y] = TileType.Block;
+            tiles[Width - 2, y] = TileType.Block;
         }
 
-        for (int x = 0; x < mWidth; ++x)
+        for (int x = 0; x < Width; ++x)
         {
             tiles[x, 1] = TileType.Block;
-            tiles[x, mHeight - 2] = TileType.Block;
+            tiles[x, Height - 2] = TileType.Block;
         }
 
         player.BotInit(inputs, prevInputs);
         player.mMap = this;
-        player.mPosition = new Vector2(2 * Map.cTileSize, (mHeight / 2) * Map.cTileSize + player.mAABB.HalfSizeY);
+        player.mPosition = new Vector2(2 * Map.cTileSize, (Height / 2) * Map.cTileSize + player.mAABB.HalfSizeY);
     }
 
     void Update()
@@ -355,7 +355,7 @@ public partial class Map : MonoBehaviour
     void AutoTile(TileType type, int x, int y, int rand4NeighbourTiles, int rand3NeighbourTiles,
         int rand2NeighbourPipeTiles, int rand2NeighbourCornerTiles, int rand1NeighbourTiles, int rand0NeighbourTiles)
     {
-        if (x >= mWidth || x < 0 || y >= mHeight || y < 0)
+        if (x >= Width || x < 0 || y >= Height || y < 0)
             return;
 
         if (tiles[x, y] != TileType.Block)

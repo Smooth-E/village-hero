@@ -169,8 +169,8 @@ public class MovingObject : MonoBehaviour
 			
 			mMap.GetMapTileAtPoint (checkedVector2i, out tileIndexX, out tileIndexY);
 			
-			if (tileIndexY < 0 || tileIndexY >= mMap.mHeight) return false;
-			if (tileIndexX < 0 || tileIndexX >= mMap.mWidth) return false;
+			if (tileIndexY < 0 || tileIndexY >= mMap.Height) return false;
+			if (tileIndexX < 0 || tileIndexX >= mMap.Width) return false;
 			
 			//if below this tile there is another tile, that means we can't possibly
 			//hit it without hitting the one below, so we can immidiately skip to the topRight corner check
@@ -180,7 +180,7 @@ public class MovingObject : MonoBehaviour
                 if (mMap.IsTileBlock(tileIndexX, tileIndexY))
 				{
 					//calculate the y position of the bottom of the ceiling tile
-					ceilingY = (float)tileIndexY * Map.cTileSize - Map.cTileSize/2.0f + mMap.position.y;
+					ceilingY = (float)tileIndexY * Map.cTileSize - Map.cTileSize/2.0f + mMap.BottomLeftCorner.y;
 					return true;
 				}
 			}
@@ -227,14 +227,14 @@ public class MovingObject : MonoBehaviour
 			
 			mMap.GetMapTileAtPoint (checkedVector2i, out tileIndexX, out tileIndexY);
 			
-			if (tileIndexY < 0 || tileIndexY >= mMap.mHeight) return false;
-			if (tileIndexX < 0 || tileIndexX >= mMap.mWidth) return false;
+			if (tileIndexY < 0 || tileIndexY >= mMap.Height) return false;
+			if (tileIndexX < 0 || tileIndexX >= mMap.Width) return false;
 			
 			//if above this tile there is another tile, that means we can't possibly
 			//hit it without hitting the one above
 			if (!mMap.IsTileBlock(tileIndexX, tileIndexY + 1))
 			{
-				var floorTop = (float)tileIndexY * Map.cTileSize + Map.cTileSize/2.0f + mMap.position.y;
+				var floorTop = (float)tileIndexY * Map.cTileSize + Map.cTileSize/2.0f + mMap.BottomLeftCorner.y;
 				//if the tile is not empty, it means we have a floor right below us
                 if (mMap.IsTileBlock(tileIndexX, tileIndexY))
 				{
@@ -295,8 +295,8 @@ public class MovingObject : MonoBehaviour
 			
 			mMap.GetMapTileAtPoint (checkedVector2i, out tileIndexX, out tileIndexY);
 			
-			if (tileIndexY < 0 || tileIndexY >= mMap.mHeight) return false;
-			if (tileIndexX < 0 || tileIndexX >= mMap.mWidth) return false;
+			if (tileIndexY < 0 || tileIndexY >= mMap.Height) return false;
+			if (tileIndexX < 0 || tileIndexX >= mMap.Width) return false;
 			
 			//if the tile has another tile on the left, we can't touch the tile's left side because it's blocked
 			if (!mMap.IsTileBlock(tileIndexX - 1, tileIndexY))
@@ -305,7 +305,7 @@ public class MovingObject : MonoBehaviour
                 if (mMap.IsTileBlock(tileIndexX, tileIndexY))
 				{
 					//calculate the x position of the left side of the wall
-					wallX = (float)tileIndexX * Map.cTileSize - Map.cTileSize/2.0f + mMap.position.x;
+					wallX = (float)tileIndexX * Map.cTileSize - Map.cTileSize/2.0f + mMap.BottomLeftCorner.x;
 					return true;
 				}
 			}
@@ -350,8 +350,8 @@ public class MovingObject : MonoBehaviour
 			
 			mMap.GetMapTileAtPoint (checkedVector2i, out tileIndexX, out tileIndexY);
 			
-			if (tileIndexY < 0 || tileIndexY >= mMap.mHeight) return false;
-			if (tileIndexX < 0 || tileIndexX >= mMap.mWidth) return false;
+			if (tileIndexY < 0 || tileIndexY >= mMap.Height) return false;
+			if (tileIndexX < 0 || tileIndexX >= mMap.Width) return false;
 			
 			//if the tile has another tile on the right, we can't touch the tile's right side because it's blocked
 			if (!mMap.IsTileBlock(tileIndexX + 1, tileIndexY))
@@ -360,7 +360,7 @@ public class MovingObject : MonoBehaviour
                 if (mMap.IsTileBlock(tileIndexX, tileIndexY))
 				{
 					//calculate the x position of the right side of the wall
-					wallX = (float)tileIndexX * Map.cTileSize + Map.cTileSize/2.0f + mMap.position.x;
+					wallX = (float)tileIndexX * Map.cTileSize + Map.cTileSize/2.0f + mMap.BottomLeftCorner.x;
 					return true;
 				}
 			}

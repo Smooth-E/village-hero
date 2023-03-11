@@ -17,21 +17,21 @@ using UnityEngine;
 namespace Algorithms
 {
     
-#region Enum
-
-    public enum HeuristicFormula
-    {
-        Manhattan           = 1,
-        MaxDXDY             = 2,
-        DiagonalShortCut    = 3,
-        Euclidean           = 4,
-        EuclideanNoSQR      = 5,
-        Custom1             = 6
-    }
-
-#endregion
+// #region Enum
+// 
+//     public enum HeuristicFormula
+//     {
+//         Manhattan           = 1,
+//         MaxDXDY             = 2,
+//         DiagonalShortCut    = 3,
+//         Euclidean           = 4,
+//         EuclideanNoSQR      = 5,
+//         Custom1             = 6
+//     }
+// 
+// #endregion
 	
-    public class PathFinderFast
+    public class ReimplementedPathFinder
     {
 
     #region Structs
@@ -125,7 +125,7 @@ namespace Algorithms
 		
     #region Constructors
 
-        public PathFinderFast(byte[,] grid, Map map)
+        public ReimplementedPathFinder(byte[,] grid, Map map)
         {
 			if (map == null)
 				throw new Exception("Map cannot be null");
