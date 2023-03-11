@@ -30,7 +30,6 @@ public class CharacterMover : MonoBehaviour
 
     public void Jump(InputAction.CallbackContext context)
     {
-        Debug.Log("Jump!");
         if (_grounder.Grounded)
             _rigidbody.AddForce(new Vector2(0, _jumpForce), ForceMode2D.Impulse);
     }
