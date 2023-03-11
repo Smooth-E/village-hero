@@ -7,9 +7,9 @@ public partial class ReimplementedMap : MonoBehaviour
 
 	public Vector3 BottomLeftCorner { private set; get; }
 	
-	private TileType[,] _tiles;
+	[HideInInspector] public TileType[,] Tiles;
 
-	public const int cTileSize = 16;
+	public const int cTileSize = 1;
 	
 	public int Width = 50;
 
@@ -19,16 +19,16 @@ public partial class ReimplementedMap : MonoBehaviour
         x < 0 || x >= Width || y < 0 || y >= Height;
 
 	public TileType GetTile(int x, int y) =>
-        IsTileOutsideOfGrid(x, y) ? TileType.Block : _tiles[x, y];
+        IsTileOutsideOfGrid(x, y) ? TileType.Block : Tiles[x, y];
 
     public bool IsTileOneWay(int x, int y) =>
-        IsTileOutsideOfGrid(x, y) ? false : _tiles[x, y] == TileType.OneWay;
+        IsTileOutsideOfGrid(x, y) ? false : Tiles[x, y] == TileType.OneWay;
 
     public bool IsTileBlock(int x, int y) =>
-        IsTileOutsideOfGrid(x, y) ? false : _tiles[x, y] == TileType.Block;
+        IsTileOutsideOfGrid(x, y) ? false : Tiles[x, y] == TileType.Block;
 
     public bool IsTileNotEmpty(int x, int y) =>
-        IsTileOutsideOfGrid(x, y) ? false : _tiles[x, y] != TileType.Empty;
+        IsTileOutsideOfGrid(x, y) ? false : Tiles[x, y] != TileType.Empty;
 	
 	public void GetMapTileAtPoint(Vector2 point, out int tileIndexX, out int tileIndexY)
 	{
@@ -131,17 +131,23 @@ public partial class ReimplementedMap : MonoBehaviour
 
     public byte[,] CreateByteGrid()
     {
-        var width = _tiles.GetLength(0);
-        var height = _tiles.GetLength(1);
+        var width = Tiles.GetLength(0);
+        var height = Tiles.GetLength(1);
         var grid = new byte[width, height];
 
         for (var x = 0; x < width; x++)
         {
             for (var y = 0; y <  height; y++)
-                grid[x, y] = (byte) _tiles[x, y];
+                grid[x, y] = (byte) Tiles[x, y];
         }
 
         return grid;
+    }
+
+    private void Awake()
+    {
+        Width = Mathf.NextPowerOfTwo(Width);
+        Height = Mathf.NextPowerOfTwo(Height);
     }
 
 }

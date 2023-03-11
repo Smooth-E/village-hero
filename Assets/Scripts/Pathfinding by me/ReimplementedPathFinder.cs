@@ -119,13 +119,13 @@ namespace Algorithms
         private int _endLocation = 0;
         private int _newGCost = 0;
 		
-		public Map _map;
+		public ReimplementedMap _map;
 
     #endregion
 		
     #region Constructors
 
-        public ReimplementedPathFinder(byte[,] grid, Map map)
+        public ReimplementedPathFinder(byte[,] grid, ReimplementedMap map)
         {
 			if (map == null)
 				throw new Exception("Map cannot be null");
@@ -342,7 +342,8 @@ namespace Algorithms
 
                     if (_location.xy == _endLocation)
                     {
-                        nodes[_location.xy][_location.z] = nodes[_location.xy][_location.z].UpdateStatus(_closeNodeValue);
+                        nodes[_location.xy][_location.z] = 
+                            nodes[_location.xy][_location.z].UpdateStatus(_closeNodeValue);
                         _found = true;
                         break;
                     }
@@ -353,7 +354,7 @@ namespace Algorithms
                         return null;
                     }
 
-                    //Lets calculate each successors
+                    // Lets calculate each successors
                     for (var i=0; i<(mDiagonals ? 8 : 4); i++)
                     {
                         _newLocationX = (ushort) (_locationX + _directions[i,0]);
@@ -374,6 +375,7 @@ namespace Algorithms
                             else if (_grid[_newLocationX + w, _newLocationY + characterHeight] == 0)
                                 atCeiling = true;
                         }
+
                         for (var h = 1; h < characterHeight - 1; ++h)
                         {
                             if (_grid[_newLocationX, _newLocationY + h] == 0
@@ -381,7 +383,7 @@ namespace Algorithms
                                 goto CHILDREN_LOOP_END;
                         }
 						
-						//calculate a proper jumplength value for the successor
+						// Calculate a proper jump length value for the successor
 
                         var jumpLength = nodes[_location.xy][_location.z].JumpLength;
                         short newJumpLength = jumpLength;
@@ -397,7 +399,9 @@ namespace Algorithms
                         }
 						else if (_newLocationY > _locationY)
 						{
-                            if (jumpLength < 2 && maxCharacterJumpHeight > 2) //first jump is always two block up instead of one up and optionally one to either right or left
+                            // First jump is always two block up instead of one up and 
+                            // optionally one to either right or left
+                            if (jumpLength < 2 && maxCharacterJumpHeight > 2)
                                 newJumpLength = 3;
                             else  if (jumpLength % 2 == 0)
                                 newJumpLength = (short)(jumpLength + 2);
@@ -416,16 +420,32 @@ namespace Algorithms
 
                         if (jumpLength >= 0 && jumpLength % 2 != 0 && _locationX != _newLocationX)
                             continue;
+                        
+                        bool condition = (
+                            (
+                                newJumpLength == 0 && 
+                                _newLocationX != _locationX && 
+                                jumpLength + 1 >= maxCharacterJumpHeight * 2 + 6 && 
+                                (jumpLength + 1 - (maxCharacterJumpHeight * 2 + 6)) % 8 <= 1
+                            ) || 
+                            (
+                                newJumpLength >= maxCharacterJumpHeight * 2 + 6 && 
+                                _newLocationX != _locationX && 
+                                (newJumpLength - (maxCharacterJumpHeight * 2 + 6)) % 8 != 7
+                            )
+                        );
 
-                        if ((newJumpLength == 0 && _newLocationX != _locationX && jumpLength + 1 >= maxCharacterJumpHeight * 2 + 6 && (jumpLength + 1 - (maxCharacterJumpHeight * 2 + 6)) % 8 <= 1)
-                             || (newJumpLength >= maxCharacterJumpHeight * 2 + 6 && _newLocationX != _locationX && (newJumpLength - (maxCharacterJumpHeight * 2 + 6)) % 8 != 7))
+                        if (condition)
 							continue;
 
-                        //if we're falling and succeor's height is bigger than ours, skip that successor
+                        // If we're falling and successor's height is bigger than ours, skip that successor
 						if (jumpLength >= maxCharacterJumpHeight * 2 && _newLocationY > _locationY)
 							continue;
 
-                        _newGCost = nodes[_location.xy][_location.z].GCost + _grid[_newLocationX, _newLocationY] + newJumpLength / 4;
+                        _newGCost = 
+                            nodes[_location.xy][_location.z].GCost + 
+                            _grid[_newLocationX, _newLocationY] + 
+                            newJumpLength / 4;
 
                         if (nodes[_newLocation].Count > 0)
                         {
@@ -440,12 +460,26 @@ namespace Algorithms
                                 if (nodes[_newLocation][j].GCost < lowestG)
                                     lowestG = nodes[_newLocation][j].GCost;
 
-                                if (nodes[_newLocation][j].JumpLength % 2 == 0 && nodes[_newLocation][j].JumpLength < maxCharacterJumpHeight * 2 + 6)
+                                condition = 
+                                    nodes[_newLocation][j].JumpLength % 2 == 0 && 
+                                    nodes[_newLocation][j].JumpLength < maxCharacterJumpHeight * 2 + 6;
+                                
+                                if (condition)
                                     couldMoveSideways = true;
                             }
 
                             // The current node has smaller cost than the previous? then skip this node
-                            if (lowestG <= _newGCost && lowestJump <= newJumpLength && (newJumpLength % 2 != 0 || newJumpLength >= maxCharacterJumpHeight * 2 + 6 || couldMoveSideways))
+
+                            condition = 
+                                lowestG <= _newGCost && 
+                                lowestJump <= newJumpLength && 
+                                (
+                                    newJumpLength % 2 != 0 || 
+                                    newJumpLength >= maxCharacterJumpHeight * 2 + 6 || 
+                                    couldMoveSideways
+                                );
+
+                            if (condition)
                                 continue;
                         }
 						
