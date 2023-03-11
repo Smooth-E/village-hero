@@ -47,7 +47,7 @@ public class Character : MovingObject
     /// </summary>
     public float mWalkSpeed;
 
-    public List<Vector2i> mPath = new List<Vector2i>();
+    public List<Vector2Int> mPath = new List<Vector2Int>();
 
     /// <summary>
     /// Raises the draw gizmos event.
@@ -131,11 +131,11 @@ public class Character : MovingObject
 
         //in air movement
         //if both or none horizontal movement keys are pressed
-        if (mInputs[(int)KeyInput.GoRight] == mInputs[(int)KeyInput.GoLeft])
+        if (mInputs[(int)KeyInput.Right] == mInputs[(int)KeyInput.Left])
         {
             mSpeed.x = 0.0f;
         }
-        else if (mInputs[(int)KeyInput.GoRight])	//if right key is pressed then accelerate right
+        else if (mInputs[(int)KeyInput.Right])	//if right key is pressed then accelerate right
         {
             transform.localScale = new Vector3(-mScale.x, mScale.y, 1.0f);
             mSpeed.x = mWalkSpeed;
@@ -146,7 +146,7 @@ public class Character : MovingObject
             if (mPushedRightWall && !mPushesRightWall)
                 mPosition.x += 1.0f;
         }
-        else if (mInputs[(int)KeyInput.GoLeft])	//if left key is pressed then accelerate left
+        else if (mInputs[(int)KeyInput.Left])	//if left key is pressed then accelerate left
         {
             transform.localScale = new Vector3(mScale.x, mScale.y, 1.0f);
             mSpeed.x = -mWalkSpeed;
@@ -181,7 +181,7 @@ public class Character : MovingObject
                 }
 
                 //if left or right key is pressed, but not both
-                if (mInputs[(int)KeyInput.GoRight] != mInputs[(int)KeyInput.GoLeft])
+                if (mInputs[(int)KeyInput.Right] != mInputs[(int)KeyInput.Left])
                 {
                     mCurrentState = CharacterState.Run;
                 }
@@ -210,17 +210,17 @@ public class Character : MovingObject
 
                 //if both or neither left nor right keys are pressed then stop walking and stand
 
-                if (mInputs[(int)KeyInput.GoRight] == mInputs[(int)KeyInput.GoLeft])
+                if (mInputs[(int)KeyInput.Right] == mInputs[(int)KeyInput.Left])
                 {
                     mCurrentState = CharacterState.Stand;
                     mSpeed = Vector2.zero;
                 }
-                else if (mInputs[(int)KeyInput.GoRight])
+                else if (mInputs[(int)KeyInput.Right])
                 {
                     mSpeed.x = mWalkSpeed;
                     transform.localScale = new Vector3(-mScale.x, mScale.y, 1.0f);
                 }
-                else if (mInputs[(int)KeyInput.GoLeft])
+                else if (mInputs[(int)KeyInput.Left])
                 {
                     mSpeed.x = -mWalkSpeed;
                     transform.localScale = new Vector3(mScale.x, mScale.y, 1.0f);
@@ -261,7 +261,7 @@ public class Character : MovingObject
                 if (mOnGround)
                 {
                     //if there's no movement change state to standing
-                    if (mInputs[(int)KeyInput.GoRight] == mInputs[(int)KeyInput.GoLeft])
+                    if (mInputs[(int)KeyInput.Right] == mInputs[(int)KeyInput.Left])
                     {
                         mCurrentState = CharacterState.Stand;
                         mSpeed = Vector2.zero;

@@ -1,7 +1,4 @@
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using System;
 
 public class MovingObject : MonoBehaviour 
 {
@@ -30,7 +27,7 @@ public class MovingObject : MonoBehaviour
 	/// <summary>
 	/// The AABB for collision queries.
 	/// </summary>
-	public AABB mAABB;
+	public AxisAlignedBoundedBox mAABB;
 	
 	/// <summary>
 	/// The tile map.
@@ -177,10 +174,10 @@ public class MovingObject : MonoBehaviour
 			
 			//if below this tile there is another tile, that means we can't possibly
 			//hit it without hitting the one below, so we can immidiately skip to the topRight corner check
-			if (!mMap.IsObstacle(tileIndexX, tileIndexY - 1))
+			if (!mMap.IsTileBlock(tileIndexX, tileIndexY - 1))
 			{
 				//if the tile is not empty, it means we have ceiling right above us
-                if (mMap.IsObstacle(tileIndexX, tileIndexY))
+                if (mMap.IsTileBlock(tileIndexX, tileIndexY))
 				{
 					//calculate the y position of the bottom of the ceiling tile
 					ceilingY = (float)tileIndexY * Map.cTileSize - Map.cTileSize/2.0f + mMap.position.y;
@@ -235,17 +232,17 @@ public class MovingObject : MonoBehaviour
 			
 			//if above this tile there is another tile, that means we can't possibly
 			//hit it without hitting the one above
-			if (!mMap.IsObstacle(tileIndexX, tileIndexY + 1))
+			if (!mMap.IsTileBlock(tileIndexX, tileIndexY + 1))
 			{
 				var floorTop = (float)tileIndexY * Map.cTileSize + Map.cTileSize/2.0f + mMap.position.y;
 				//if the tile is not empty, it means we have a floor right below us
-                if (mMap.IsObstacle(tileIndexX, tileIndexY))
+                if (mMap.IsTileBlock(tileIndexX, tileIndexY))
 				{
 					//calculate the y position of the floor tile's top
 					groundY = floorTop;
 					return true;
 				}//if there's a one way platform below us, treat it as a floor only if we're falling or standing
-				else if ((mMap.IsOneWayPlatform(tileIndexX, tileIndexY) && !mIgnoresOneWayPlatforms) && mSpeed.y <= 0.0f
+				else if ((mMap.IsTileOneWay(tileIndexX, tileIndexY) && !mIgnoresOneWayPlatforms) && mSpeed.y <= 0.0f
 						&& Mathf.Abs(checkedVector2i.y - floorTop) <= cOneWayPlatformThreshold + mOldPosition.y - position.y)
 				{
 					groundY = floorTop;
@@ -302,10 +299,10 @@ public class MovingObject : MonoBehaviour
 			if (tileIndexX < 0 || tileIndexX >= mMap.mWidth) return false;
 			
 			//if the tile has another tile on the left, we can't touch the tile's left side because it's blocked
-			if (!mMap.IsObstacle(tileIndexX - 1, tileIndexY))
+			if (!mMap.IsTileBlock(tileIndexX - 1, tileIndexY))
 			{
 				//if the tile is not empty, then we hit the wall
-                if (mMap.IsObstacle(tileIndexX, tileIndexY))
+                if (mMap.IsTileBlock(tileIndexX, tileIndexY))
 				{
 					//calculate the x position of the left side of the wall
 					wallX = (float)tileIndexX * Map.cTileSize - Map.cTileSize/2.0f + mMap.position.x;
@@ -357,10 +354,10 @@ public class MovingObject : MonoBehaviour
 			if (tileIndexX < 0 || tileIndexX >= mMap.mWidth) return false;
 			
 			//if the tile has another tile on the right, we can't touch the tile's right side because it's blocked
-			if (!mMap.IsObstacle(tileIndexX + 1, tileIndexY))
+			if (!mMap.IsTileBlock(tileIndexX + 1, tileIndexY))
 			{
 				//if the tile is not empty, then we hit the wall
-                if (mMap.IsObstacle(tileIndexX, tileIndexY))
+                if (mMap.IsTileBlock(tileIndexX, tileIndexY))
 				{
 					//calculate the x position of the right side of the wall
 					wallX = (float)tileIndexX * Map.cTileSize + Map.cTileSize/2.0f + mMap.position.x;

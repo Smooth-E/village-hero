@@ -1,14 +1,13 @@
 using UnityEngine;
-using System.Collections;
 
 [System.Serializable]
-public class AABB
+public class AxisAlignedBoundedBox
 {
 	/// <summary>
 	/// The center of the AABB.
 	/// </summary>
-	[HideInInspector]
 	private Vector2 center;
+
 	/// <summary>
 	/// The half size of the AABB.
 	/// </summary>
@@ -48,12 +47,8 @@ public class AABB
         get { return halfSize.y; }
         set { halfSize.y = value; }
     }
-
-	public AABB()
-	{
-	}
 	
-	public AABB(Vector2 center, Vector2 halfSize) 
+	public AxisAlignedBoundedBox(Vector2 center, Vector2 halfSize) 
 	{
 		this.center = center;
 		this.halfSize = halfSize;
@@ -65,7 +60,7 @@ public class AABB
 	/// <param name='other'>
 	/// The AABB to test against.
 	/// </param>
-	public bool Overlaps(AABB other)
+	public bool Overlaps(AxisAlignedBoundedBox other)
 	{
 		if ( Mathf.Abs(center.x - other.center.x) > halfSize.x + other.halfSize.x ) return false;
 		if ( Mathf.Abs(center.y - other.center.y) > halfSize.y + other.halfSize.y ) return false;
@@ -93,7 +88,7 @@ public class AABB
 	/// <param name='overlapHeight'>
 	/// The signed overlap height.
 	/// </param>
-	public bool Overlaps(AABB other, out float overlapWidth, out float overlapHeight)
+	public bool Overlaps(AxisAlignedBoundedBox other, out float overlapWidth, out float overlapHeight)
 	{
 		overlapWidth = overlapHeight = 0;
 		if ( Mathf.Abs(center.x - other.center.x) > halfSize.x + other.halfSize.x ) return false;
@@ -112,21 +107,21 @@ public class AABB
 	/// <param name='b'>
 	/// A reference to the second AABB.
 	/// </param>
-	public static bool Overlaps(AABB a, AABB b)
+	public static bool Overlaps(AxisAlignedBoundedBox a, AxisAlignedBoundedBox b)
 	{
 		if ( Mathf.Abs(a.center.x - b.center.x) > a.halfSize.x + b.halfSize.x ) return false;
 		if ( Mathf.Abs(a.center.y - b.center.y) > a.halfSize.y + b.halfSize.y ) return false;
 		return true;
 	}
 	
-	public static bool Overlaps(AABB a, Vector2 otherCenter, Vector2 otherHalfSize)
+	public static bool Overlaps(AxisAlignedBoundedBox a, Vector2 otherCenter, Vector2 otherHalfSize)
 	{
 		if ( Mathf.Abs(a.center.x - otherCenter.x) > a.halfSize.x + otherHalfSize.x ) return false;
 		if ( Mathf.Abs(a.center.y - otherCenter.y) > a.halfSize.y + otherHalfSize.y ) return false;
 		return true;
 	}
 	
-	public static bool Overlaps(AABB a, AABB b, out float overlapWidth, out float overlapHeight)
+	public static bool Overlaps(AxisAlignedBoundedBox a, AxisAlignedBoundedBox b, out float overlapWidth, out float overlapHeight)
 	{
 		overlapWidth = overlapHeight = 0;
 		if ( Mathf.Abs(a.center.x - b.center.x) > a.halfSize.x + b.halfSize.x ) return false;
@@ -148,7 +143,7 @@ public class AABB
 	/// <param name='p'>
 	/// If set to <c>true</c> p.
 	/// </param>
-	public static bool PointInside(AABB a, Vector2 p)
+	public static bool PointInside(AxisAlignedBoundedBox a, Vector2 p)
 	{
 		if ( Mathf.Abs(a.center.x - p.x) > a.halfSize.x ) return false;
 		if ( Mathf.Abs(a.center.y - p.y) > a.halfSize.y ) return false;

@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 public enum RoomEntranceType
@@ -48,7 +47,7 @@ public class MapRoomData : ScriptableObject
 	public List<RoomEntrance> entrances = new List<RoomEntrance>();
 	public List<ObjectTile> objectTiles = new List<ObjectTile>();
     public List<ObjectTile> secondWave = new List<ObjectTile>();
-    public Vector2i floorEntrance;
+    public Vector2Int floorEntrance;
 
 	public TileType entranceFill;
 	public TileType[] tileData;

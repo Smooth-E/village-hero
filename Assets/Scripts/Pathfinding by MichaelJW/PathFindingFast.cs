@@ -11,14 +11,14 @@
 //
 
 using System;
-using System.Threading;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Algorithms
 {
-	#region Enum
+    
+#region Enum
+
     public enum HeuristicFormula
     {
         Manhattan           = 1,
@@ -28,10 +28,14 @@ namespace Algorithms
         EuclideanNoSQR      = 5,
         Custom1             = 6
     }
-    #endregion
+
+#endregion
 	
     public class PathFinderFast
     {
+
+    #region Structs
+
         public struct Location
         {
             public Location(int xy, int z)
@@ -44,18 +48,21 @@ namespace Algorithms
             public int z;
         }
 
-		#region Structs
         internal struct PathFinderNodeFast
         {
-            #region Variables Declaration
-            public int     F; // f = gone + heuristic
-            public int     G;
-            public ushort  PX; // Parent
-            public ushort  PY;
-            public byte    Status;
-            public byte    PZ;
-			public short   JumpLength;
-            #endregion
+
+        #region Variables Declaration
+
+            // f = gone + heuristic
+            public int FCost;
+            public int GCost;
+            public ushort ParentX;
+            public ushort ParentY;
+            public byte ParentZ;
+            public byte Status;
+			public short JumpLength;
+
+        #endregion
 
             public PathFinderNodeFast UpdateStatus(byte newStatus)
             {
@@ -65,53 +72,57 @@ namespace Algorithms
             }
         }
 		
-        #endregion
+
+    #endregion
 		
 		private List<PathFinderNodeFast>[] nodes;
         private Stack<int> touchedLocations;
 		
-        #region Variables Declaration
-        // Heap variables are initializated to default, but I like to do it anyway
-        private byte[,]                         mGrid                   = null;
-        private PriorityQueueB<Location>        mOpen                   = null;
-        private List<Vector2i>                  mClose                  = null;
-        private bool                            mStop                   = false;
-        private bool                            mStopped                = true;
-        private HeuristicFormula                mFormula                = HeuristicFormula.Manhattan;
-        private bool                            mDiagonals              = true;
-        private int                             mHEstimate              = 2;
-        private bool                            mPunishChangeDirection  = false;
-        private bool                            mTieBreaker             = false;
-        private bool                            mHeavyDiagonals         = false;
-        private int                             mSearchLimit            = 2000;
-        private double                          mCompletedTime          = 0;
-        private bool                            mDebugProgress          = false;
-        private bool                            mDebugFoundPath         = false;
-        private byte                            mOpenNodeValue          = 1;
-        private byte                            mCloseNodeValue         = 2;
+    #region Variables Declaration
+
+        // Heap variables are initialized to default, but I like to do it anyway
+        private byte[,] _grid                   = null;
+        private PriorityQueueB<Location> _openNodes                   = null;
+        private List<Vector2Int> _closedNodes                  = null;
+        private bool _stop = false;
+        private bool _stopped = true;
+        private HeuristicFormula _formula = HeuristicFormula.Manhattan;
+        private bool mDiagonals = true;
+        private int mHEstimate = 2;
+        private bool _punishChangeDirection = false;
+        private bool _tieBreaker = false;
+        private bool _heavyDiagonals = false;
+        private int _searchLimit = 2000;
+        private double _completedTime = 0;
+        private bool _debugProgress = false;
+        private bool _debugFoundPath = false;
+        private byte _openNodeValue = 1;
+        private byte _closeNodeValue = 2;
         
-        //Promoted local variables to member variables to avoid recreation between calls
-        private int                             mH                      = 0;
-        private Location                        mLocation             ;
-        private int                             mNewLocation            = 0;
-        private ushort                          mLocationX              = 0;
-        private ushort                          mLocationY              = 0;
-        private ushort                          mNewLocationX           = 0;
-        private ushort                          mNewLocationY           = 0;
-        private int                             mCloseNodeCounter       = 0;
-        private ushort                          mGridX                  = 0;
-        private ushort                          mGridY                  = 0;
-        private ushort                          mGridXMinus1            = 0;
-        private ushort                          mGridXLog2              = 0;
-        private bool                            mFound                  = false;
-        private sbyte[,]                        mDirection              = new sbyte[8,2]{{0,-1} , {1,0}, {0,1}, {-1,0}, {1,-1}, {1,1}, {-1,1}, {-1,-1}};
-        private int                             mEndLocation            = 0;
-        private int                             mNewG                   = 0;
+        // Promoted local variables to member variables to avoid recreation between calls
+        private int _hCost = 0;
+        private Location _location;
+        private int _newLocation = 0;
+        private ushort _locationX = 0;
+        private ushort _locationY = 0;
+        private ushort _newLocationX = 0;
+        private ushort _newLocationY = 0;
+        private int _closeNodeCounter = 0;
+        private ushort _gridX = 0;
+        private ushort _gridY = 0;
+        private ushort _gridXMinus1 = 0;
+        private ushort _gridXLog2 = 0;
+        private bool _found = false;
+        private sbyte[,] _directions = new sbyte[8,2] { {0,-1} , {1,0}, {0,1}, {-1,0}, {1,-1}, {1,1}, {-1,1}, {-1,-1} };
+        private int _endLocation = 0;
+        private int _newGCost = 0;
 		
-		public Map mMap;
-        #endregion
+		public Map _map;
+
+    #endregion
 		
-        #region Constructors
+    #region Constructors
+
         public PathFinderFast(byte[,] grid, Map map)
         {
 			if (map == null)
@@ -119,62 +130,60 @@ namespace Algorithms
             if (grid == null)
                 throw new Exception("Grid cannot be null");
 			
-			mMap = map;
-            mGrid           = grid;
-            mGridX          = (ushort) (mGrid.GetUpperBound(0) + 1);
-            mGridY          = (ushort) (mGrid.GetUpperBound(1) + 1);
-            mGridXMinus1    = (ushort) (mGridX - 1);
-            mGridXLog2      = (ushort) Math.Log(mGridX, 2);
+			_map = map;
+            _grid           = grid;
+            _gridX          = (ushort) (_grid.GetUpperBound(0) + 1);
+            _gridY          = (ushort) (_grid.GetUpperBound(1) + 1);
+            _gridXMinus1    = (ushort) (_gridX - 1);
+            _gridXLog2      = (ushort) Math.Log(_gridX, 2);
 
-            if (Math.Log(mGridX, 2) != (int) Math.Log(mGridX, 2) ||
-                Math.Log(mGridY, 2) != (int) Math.Log(mGridY, 2))
+            if (Math.Log(_gridX, 2) != (int) Math.Log(_gridX, 2) ||
+                Math.Log(_gridY, 2) != (int) Math.Log(_gridY, 2))
                 throw new Exception("Invalid Grid, size in X and Y must be power of 2");
 
-            if (nodes == null || nodes.Length != (mGridX * mGridY))
+            if (nodes == null || nodes.Length != (_gridX * _gridY))
 			{
-				nodes = new List<PathFinderNodeFast>[mGridX * mGridY];
-                touchedLocations = new Stack<int>(mGridX * mGridY);
-                mClose = new List<Vector2i>(mGridX * mGridY);
+				nodes = new List<PathFinderNodeFast>[_gridX * _gridY];
+                touchedLocations = new Stack<int>(_gridX * _gridY);
+                _closedNodes = new List<Vector2Int>(_gridX * _gridY);
 			}
 			
 			for (var i = 0; i < nodes.Length; ++i)
-			{
 				nodes[i] = new List<PathFinderNodeFast>(1);
-			}
 
-            mOpen   = new PriorityQueueB<Location>(new ComparePFNodeMatrix(nodes));
+            _openNodes   = new PriorityQueueB<Location>(new ComparePFNodeMatrix(nodes));
         }
-        #endregion
 
-        #region Properties
-        public bool Stopped
-        {
-            get { return mStopped; }
-        }
+    #endregion
+
+    #region Properties
+
+        public bool Stopped => _stopped;
 
         public HeuristicFormula Formula
         {
-            get { return mFormula; }
-            set { mFormula = value; }
+            get => _formula;
+            set => _formula = value;
         }
 
         public bool Diagonals
         {
-            get { return mDiagonals; }
+            get => mDiagonals;
             set 
             { 
                 mDiagonals = value; 
+
                 if (mDiagonals)
-                    mDirection = new sbyte[8,2]{{0,-1} , {1,0}, {0,1}, {-1,0}, {1,-1}, {1,1}, {-1,1}, {-1,-1}};
+                    _directions = new sbyte[8,2] { {0,-1} , {1,0}, {0,1}, {-1,0}, {1,-1}, {1,1}, {-1,1}, {-1,-1} };
                 else
-                    mDirection = new sbyte[4,2]{{0,-1} , {1,0}, {0,1}, {-1,0}};
+                    _directions = new sbyte[4,2] { {0,-1} , {1,0}, {0,1}, {-1,0} };
             }
         }
 
         public bool HeavyDiagonals
         {
-            get { return mHeavyDiagonals; }
-            set { mHeavyDiagonals = value; }
+            get { return _heavyDiagonals; }
+            set { _heavyDiagonals = value; }
         }
 
         public int HeuristicEstimate
@@ -185,49 +194,56 @@ namespace Algorithms
 
         public bool PunishChangeDirection
         {
-            get { return mPunishChangeDirection; }
-            set { mPunishChangeDirection = value; }
+            get { return _punishChangeDirection; }
+            set { _punishChangeDirection = value; }
         }
 
         public bool TieBreaker
         {
-            get { return mTieBreaker; }
-            set { mTieBreaker = value; }
+            get { return _tieBreaker; }
+            set { _tieBreaker = value; }
         }
 
         public int SearchLimit
         {
-            get { return mSearchLimit; }
-            set { mSearchLimit = value; }
+            get { return _searchLimit; }
+            set { _searchLimit = value; }
         }
 
         public double CompletedTime
         {
-            get { return mCompletedTime; }
-            set { mCompletedTime = value; }
+            get { return _completedTime; }
+            set { _completedTime = value; }
         }
 
         public bool DebugProgress
         {
-            get { return mDebugProgress; }
-            set { mDebugProgress = value; }
+            get { return _debugProgress; }
+            set { _debugProgress = value; }
         }
 
         public bool DebugFoundPath
         {
-            get { return mDebugFoundPath; }
-            set { mDebugFoundPath = value; }
+            get { return _debugFoundPath; }
+            set { _debugFoundPath = value; }
         }
-        #endregion
 
-        #region Methods
+    #endregion
+
+    #region Methods
+
         public void FindPathStop()
         {
-            mStop = true;
+            _stop = true;
         }
 
-        public List<Vector2i> FindPath(Vector2i start, Vector2i end, int characterWidth, int characterHeight, short maxCharacterJumpHeight)
-        {
+        public List<Vector2Int> FindPath(
+            Vector2Int start, 
+            Vector2Int end, 
+            int characterWidth, 
+            int characterHeight, 
+            short maxCharacterJumpHeight
+        ) {
             lock(this)
             {
                 while (touchedLocations.Count > 0)
@@ -240,8 +256,8 @@ namespace Algorithms
                     inSolidTile = false;
                     for (var w = 0; w < characterWidth; ++w)
                     {
-                        if (mGrid[end.x + w, end.y] == 0
-                            || mGrid[end.x + w, end.y + characterHeight - 1] == 0)
+                        if (_grid[end.x + w, end.y] == 0
+                            || _grid[end.x + w, end.y + characterHeight - 1] == 0)
                         {
                             inSolidTile = true;
                             break;
@@ -252,8 +268,8 @@ namespace Algorithms
                     {
                         for (var h = 1; h < characterHeight - 1; ++h)
                         {
-                            if (mGrid[end.x, end.y + h] == 0
-                                || mGrid[end.x + characterWidth - 1, end.y + h] == 0)
+                            if (_grid[end.x, end.y + h] == 0
+                                || _grid[end.x + characterWidth - 1, end.y + h] == 0)
                             {
                                 inSolidTile = true;
                                 break;
@@ -270,31 +286,31 @@ namespace Algorithms
                 if (inSolidTile == true)
                     return null;
 
-                mFound              = false;
-                mStop               = false;
-                mStopped            = false;
-                mCloseNodeCounter   = 0;
-                mOpenNodeValue      += 2;
-                mCloseNodeValue     += 2;
-                mOpen.Clear();
+                _found = false;
+                _stop = false;
+                _stopped = false;
+                _closeNodeCounter = 0;
+                _openNodeValue += 2;
+                _closeNodeValue += 2;
+                _openNodes.Clear();
 
-                mLocation.xy                     = (start.y << mGridXLog2) + start.x;
-                mLocation.z                     = 0;
-                mEndLocation                    = (end.y << mGridXLog2) + end.x;
+                _location.xy = (start.y << _gridXLog2) + start.x;
+                _location.z = 0;
+                _endLocation = (end.y << _gridXLog2) + end.x;
 
                 PathFinderNodeFast firstNode = new PathFinderNodeFast();
-                firstNode.G = 0;
-                firstNode.F = mHEstimate;
-                firstNode.PX = (ushort)start.x;
-                firstNode.PY = (ushort)start.y;
-                firstNode.PZ = 0;
-                firstNode.Status = mOpenNodeValue;
+                firstNode.GCost = 0;
+                firstNode.FCost = mHEstimate;
+                firstNode.ParentX = (ushort)start.x;
+                firstNode.ParentY = (ushort)start.y;
+                firstNode.ParentZ = 0;
+                firstNode.Status = _openNodeValue;
 
                 bool startsOnGround = false;
 
                 for (int x = start.x; x < start.x + characterWidth; ++x)
                 {
-                    if (mMap.IsGround(x, start.y - 1))
+                    if (_map.IsTileBlock(x, start.y - 1))
                     {
                         startsOnGround = true;
                         break;
@@ -306,78 +322,78 @@ namespace Algorithms
                 else
                     firstNode.JumpLength = (short)(maxCharacterJumpHeight * 2);
 
-                nodes[mLocation.xy].Add(firstNode);
-                touchedLocations.Push(mLocation.xy);
+                nodes[_location.xy].Add(firstNode);
+                touchedLocations.Push(_location.xy);
 
-                mOpen.Push(mLocation);
+                _openNodes.Push(_location);
 				
-                while(mOpen.Count > 0 && !mStop)
+                while(_openNodes.Count > 0 && !_stop)
                 {
-                    mLocation    = mOpen.Pop();
+                    _location    = _openNodes.Pop();
 
                     //Is it in closed list? means this node was already processed
-                    if (nodes[mLocation.xy][mLocation.z].Status == mCloseNodeValue)
+                    if (nodes[_location.xy][_location.z].Status == _closeNodeValue)
                         continue;
 
-                    mLocationX   = (ushort) (mLocation.xy & mGridXMinus1);
-                    mLocationY   = (ushort) (mLocation.xy >> mGridXLog2);
+                    _locationX   = (ushort) (_location.xy & _gridXMinus1);
+                    _locationY   = (ushort) (_location.xy >> _gridXLog2);
 
-                    if (mLocation.xy == mEndLocation)
+                    if (_location.xy == _endLocation)
                     {
-                        nodes[mLocation.xy][mLocation.z] = nodes[mLocation.xy][mLocation.z].UpdateStatus(mCloseNodeValue);
-                        mFound = true;
+                        nodes[_location.xy][_location.z] = nodes[_location.xy][_location.z].UpdateStatus(_closeNodeValue);
+                        _found = true;
                         break;
                     }
 
-                    if (mCloseNodeCounter > mSearchLimit)
+                    if (_closeNodeCounter > _searchLimit)
                     {
-                        mStopped = true;
+                        _stopped = true;
                         return null;
                     }
 
                     //Lets calculate each successors
                     for (var i=0; i<(mDiagonals ? 8 : 4); i++)
                     {
-                        mNewLocationX = (ushort) (mLocationX + mDirection[i,0]);
-                        mNewLocationY = (ushort) (mLocationY + mDirection[i,1]);
-                        mNewLocation  = (mNewLocationY << mGridXLog2) + mNewLocationX;
+                        _newLocationX = (ushort) (_locationX + _directions[i,0]);
+                        _newLocationY = (ushort) (_locationY + _directions[i,1]);
+                        _newLocation  = (_newLocationY << _gridXLog2) + _newLocationX;
 
                         var onGround = false;
                         var atCeiling = false;
 
                         for (var w = 0; w < characterWidth; ++w)
                         {
-                            if (mGrid[mNewLocationX + w, mNewLocationY] == 0
-                                || mGrid[mNewLocationX + w, mNewLocationY + characterHeight - 1] == 0)
+                            if (_grid[_newLocationX + w, _newLocationY] == 0
+                                || _grid[_newLocationX + w, _newLocationY + characterHeight - 1] == 0)
                                 goto CHILDREN_LOOP_END;
 
-                            if (mMap.IsGround(mNewLocationX + w, mNewLocationY - 1))
+                            if (_map.IsTileBlock(_newLocationX + w, _newLocationY - 1))
                                 onGround = true;
-                            else if (mGrid[mNewLocationX + w, mNewLocationY + characterHeight] == 0)
+                            else if (_grid[_newLocationX + w, _newLocationY + characterHeight] == 0)
                                 atCeiling = true;
                         }
                         for (var h = 1; h < characterHeight - 1; ++h)
                         {
-                            if (mGrid[mNewLocationX, mNewLocationY + h] == 0
-                                || mGrid[mNewLocationX + characterWidth - 1, mNewLocationY + h] == 0)
+                            if (_grid[_newLocationX, _newLocationY + h] == 0
+                                || _grid[_newLocationX + characterWidth - 1, _newLocationY + h] == 0)
                                 goto CHILDREN_LOOP_END;
                         }
 						
 						//calculate a proper jumplength value for the successor
 
-                        var jumpLength = nodes[mLocation.xy][mLocation.z].JumpLength;
+                        var jumpLength = nodes[_location.xy][_location.z].JumpLength;
                         short newJumpLength = jumpLength;
 
                         if (onGround)
 							newJumpLength = 0;
 						else if (atCeiling)
                         {
-                            if (mNewLocationX != mLocationX)
+                            if (_newLocationX != _locationX)
                                 newJumpLength = (short)Mathf.Max(maxCharacterJumpHeight * 2 + 1, jumpLength + 1);
                             else
                                 newJumpLength = (short)Mathf.Max(maxCharacterJumpHeight * 2, jumpLength + 2);
                         }
-						else if (mNewLocationY > mLocationY)
+						else if (_newLocationY > _locationY)
 						{
                             if (jumpLength < 2 && maxCharacterJumpHeight > 2) //first jump is always two block up instead of one up and optionally one to either right or left
                                 newJumpLength = 3;
@@ -386,178 +402,189 @@ namespace Algorithms
                             else
                                 newJumpLength = (short)(jumpLength + 1);
 						}
-						else if (mNewLocationY < mLocationY)
+						else if (_newLocationY < _locationY)
 						{
 							if (jumpLength % 2 == 0)
 								newJumpLength = (short)Mathf.Max(maxCharacterJumpHeight * 2, jumpLength + 2);
 							else
 								newJumpLength = (short)Mathf.Max(maxCharacterJumpHeight * 2, jumpLength + 1);
 						}
-						else if (!onGround && mNewLocationX != mLocationX)
+						else if (!onGround && _newLocationX != _locationX)
 							newJumpLength = (short)(jumpLength + 1);
 
-                        if (jumpLength >= 0 && jumpLength % 2 != 0 && mLocationX != mNewLocationX)
+                        if (jumpLength >= 0 && jumpLength % 2 != 0 && _locationX != _newLocationX)
                             continue;
 
-                        if ((newJumpLength == 0 && mNewLocationX != mLocationX && jumpLength + 1 >= maxCharacterJumpHeight * 2 + 6 && (jumpLength + 1 - (maxCharacterJumpHeight * 2 + 6)) % 8 <= 1)
-                             || (newJumpLength >= maxCharacterJumpHeight * 2 + 6 && mNewLocationX != mLocationX && (newJumpLength - (maxCharacterJumpHeight * 2 + 6)) % 8 != 7))
+                        if ((newJumpLength == 0 && _newLocationX != _locationX && jumpLength + 1 >= maxCharacterJumpHeight * 2 + 6 && (jumpLength + 1 - (maxCharacterJumpHeight * 2 + 6)) % 8 <= 1)
+                             || (newJumpLength >= maxCharacterJumpHeight * 2 + 6 && _newLocationX != _locationX && (newJumpLength - (maxCharacterJumpHeight * 2 + 6)) % 8 != 7))
 							continue;
 
                         //if we're falling and succeor's height is bigger than ours, skip that successor
-						if (jumpLength >= maxCharacterJumpHeight * 2 && mNewLocationY > mLocationY)
+						if (jumpLength >= maxCharacterJumpHeight * 2 && _newLocationY > _locationY)
 							continue;
 
-                        mNewG = nodes[mLocation.xy][mLocation.z].G + mGrid[mNewLocationX, mNewLocationY] + newJumpLength / 4;
+                        _newGCost = nodes[_location.xy][_location.z].GCost + _grid[_newLocationX, _newLocationY] + newJumpLength / 4;
 
-                        if (nodes[mNewLocation].Count > 0)
+                        if (nodes[_newLocation].Count > 0)
                         {
                             int lowestJump = short.MaxValue;
                             int lowestG = short.MaxValue;
                             bool couldMoveSideways = false;
-                            for (int j = 0; j < nodes[mNewLocation].Count; ++j)
+                            for (int j = 0; j < nodes[_newLocation].Count; ++j)
                             {
-                                if (nodes[mNewLocation][j].JumpLength < lowestJump)
-                                    lowestJump = nodes[mNewLocation][j].JumpLength;
+                                if (nodes[_newLocation][j].JumpLength < lowestJump)
+                                    lowestJump = nodes[_newLocation][j].JumpLength;
 
-                                if (nodes[mNewLocation][j].G < lowestG)
-                                    lowestG = nodes[mNewLocation][j].G;
+                                if (nodes[_newLocation][j].GCost < lowestG)
+                                    lowestG = nodes[_newLocation][j].GCost;
 
-                                if (nodes[mNewLocation][j].JumpLength % 2 == 0 && nodes[mNewLocation][j].JumpLength < maxCharacterJumpHeight * 2 + 6)
+                                if (nodes[_newLocation][j].JumpLength % 2 == 0 && nodes[_newLocation][j].JumpLength < maxCharacterJumpHeight * 2 + 6)
                                     couldMoveSideways = true;
                             }
 
                             // The current node has smaller cost than the previous? then skip this node
-                            if (lowestG <= mNewG && lowestJump <= newJumpLength && (newJumpLength % 2 != 0 || newJumpLength >= maxCharacterJumpHeight * 2 + 6 || couldMoveSideways))
+                            if (lowestG <= _newGCost && lowestJump <= newJumpLength && (newJumpLength % 2 != 0 || newJumpLength >= maxCharacterJumpHeight * 2 + 6 || couldMoveSideways))
                                 continue;
                         }
 						
-                        switch(mFormula)
+                        switch(_formula)
                         {
                             default:
                             case HeuristicFormula.Manhattan:
-                                mH = mHEstimate * (Mathf.Abs(mNewLocationX - end.x) + Mathf.Abs(mNewLocationY - end.y));
+                                _hCost = mHEstimate * (Mathf.Abs(_newLocationX - end.x) + Mathf.Abs(_newLocationY - end.y));
                                 break;
                             case HeuristicFormula.MaxDXDY:
-                                mH = mHEstimate * (Math.Max(Math.Abs(mNewLocationX - end.x), Math.Abs(mNewLocationY - end.y)));
+                                _hCost = mHEstimate * (Math.Max(Math.Abs(_newLocationX - end.x), Math.Abs(_newLocationY - end.y)));
                                 break;
                             case HeuristicFormula.DiagonalShortCut:
-                                var h_diagonal  = Math.Min(Math.Abs(mNewLocationX - end.x), Math.Abs(mNewLocationY - end.y));
-                                var h_straight  = (Math.Abs(mNewLocationX - end.x) + Math.Abs(mNewLocationY - end.y));
-                                mH = (mHEstimate * 2) * h_diagonal + mHEstimate * (h_straight - 2 * h_diagonal);
+                                var h_diagonal  = Math.Min(Math.Abs(_newLocationX - end.x), Math.Abs(_newLocationY - end.y));
+                                var h_straight  = (Math.Abs(_newLocationX - end.x) + Math.Abs(_newLocationY - end.y));
+                                _hCost = (mHEstimate * 2) * h_diagonal + mHEstimate * (h_straight - 2 * h_diagonal);
                                 break;
                             case HeuristicFormula.Euclidean:
-                                mH = (int) (mHEstimate * Math.Sqrt(Math.Pow((mNewLocationY - end.x) , 2) + Math.Pow((mNewLocationY - end.y), 2)));
+                                _hCost = (int) (mHEstimate * Math.Sqrt(Math.Pow((_newLocationY - end.x) , 2) + Math.Pow((_newLocationY - end.y), 2)));
                                 break;
                             case HeuristicFormula.EuclideanNoSQR:
-                                mH = (int) (mHEstimate * (Math.Pow((mNewLocationX - end.x) , 2) + Math.Pow((mNewLocationY - end.y), 2)));
+                                _hCost = (int) (mHEstimate * (Math.Pow((_newLocationX - end.x) , 2) + Math.Pow((_newLocationY - end.y), 2)));
                                 break;
                             case HeuristicFormula.Custom1:
-                                var dxy       = new Vector2i(Math.Abs(end.x - mNewLocationX), Math.Abs(end.y - mNewLocationY));
+                                var dxy       = new Vector2Int(Math.Abs(end.x - _newLocationX), Math.Abs(end.y - _newLocationY));
                                 var Orthogonal  = Math.Abs(dxy.x - dxy.y);
                                 var Diagonal    = Math.Abs(((dxy.x + dxy.y) - Orthogonal) / 2);
-                                mH = mHEstimate * (Diagonal + Orthogonal + dxy.x + dxy.y);
+                                _hCost = mHEstimate * (Diagonal + Orthogonal + dxy.x + dxy.y);
                                 break;
                         }
 
                         PathFinderNodeFast newNode = new PathFinderNodeFast();
                         newNode.JumpLength = newJumpLength;
-                        newNode.PX = mLocationX;
-                        newNode.PY = mLocationY;
-                        newNode.PZ = (byte)mLocation.z;
-                        newNode.G = mNewG;
-                        newNode.F = mNewG + mH;
-                        newNode.Status = mOpenNodeValue;
+                        newNode.ParentX = _locationX;
+                        newNode.ParentY = _locationY;
+                        newNode.ParentZ = (byte)_location.z;
+                        newNode.GCost = _newGCost;
+                        newNode.FCost = _newGCost + _hCost;
+                        newNode.Status = _openNodeValue;
 
-                        if (nodes[mNewLocation].Count == 0)
-                            touchedLocations.Push(mNewLocation);
+                        if (nodes[_newLocation].Count == 0)
+                            touchedLocations.Push(_newLocation);
 
-                        nodes[mNewLocation].Add(newNode);
-                        mOpen.Push(new Location(mNewLocation, nodes[mNewLocation].Count - 1));
+                        nodes[_newLocation].Add(newNode);
+                        _openNodes.Push(new Location(_newLocation, nodes[_newLocation].Count - 1));
 						
 					CHILDREN_LOOP_END:
 						continue;
                     }
 
-                    nodes[mLocation.xy][mLocation.z] = nodes[mLocation.xy][mLocation.z].UpdateStatus(mCloseNodeValue);
-                    mCloseNodeCounter++;
+                    nodes[_location.xy][_location.z] = nodes[_location.xy][_location.z].UpdateStatus(_closeNodeValue);
+                    _closeNodeCounter++;
                 }
 
-                if (mFound)
+                if (_found)
                 {
-                    mClose.Clear();
+                    _closedNodes.Clear();
                     var posX = end.x;
                     var posY = end.y;
 					
 					var fPrevNodeTmp = new PathFinderNodeFast();
-                    var fNodeTmp = nodes[mEndLocation][0];
+                    var fNodeTmp = nodes[_endLocation][0];
 					
                     var fNode = end;
                     var fPrevNode = end;
 
-                    var loc = (fNodeTmp.PY << mGridXLog2) + fNodeTmp.PX;
+                    var loc = (fNodeTmp.ParentY << _gridXLog2) + fNodeTmp.ParentX;
 					
-                    while(fNode.x != fNodeTmp.PX || fNode.y != fNodeTmp.PY)
+                    while(fNode.x != fNodeTmp.ParentX || fNode.y != fNodeTmp.ParentY)
                     {
-                        var fNextNodeTmp = nodes[loc][fNodeTmp.PZ];
+                        var fNextNodeTmp = nodes[loc][fNodeTmp.ParentZ];
                         
-                        if ((mClose.Count == 0)
-                            || (mMap.IsOneWayPlatform(fNode.x, fNode.y - 1))
-                            || (mGrid[fNode.x, fNode.y - 1] == 0 && mMap.IsOneWayPlatform(fPrevNode.x, fPrevNode.y - 1))
+                        if ((_closedNodes.Count == 0)
+                            || (_map.IsTileOneWay(fNode.x, fNode.y - 1))
+                            || (_grid[fNode.x, fNode.y - 1] == 0 && _map.IsTileOneWay(fPrevNode.x, fPrevNode.y - 1))
                             || (fNodeTmp.JumpLength == 3)
                             || (fNextNodeTmp.JumpLength != 0 && fNodeTmp.JumpLength == 0)                                                                                                       //mark jumps starts
                             || (fNodeTmp.JumpLength == 0 && fPrevNodeTmp.JumpLength != 0)                                                                                                       //mark landings
-                            || (fNode.y > mClose[mClose.Count - 1].y && fNode.y > fNodeTmp.PY)
-                            || (fNode.y < mClose[mClose.Count - 1].y && fNode.y < fNodeTmp.PY)
-                            || ((mMap.IsGround(fNode.x - 1, fNode.y) || mMap.IsGround(fNode.x + 1, fNode.y)) 
-                                && fNode.y != mClose[mClose.Count - 1].y && fNode.x != mClose[mClose.Count - 1].x))
-                            mClose.Add(fNode);
+                            || (fNode.y > _closedNodes[_closedNodes.Count - 1].y && fNode.y > fNodeTmp.ParentY)
+                            || (fNode.y < _closedNodes[_closedNodes.Count - 1].y && fNode.y < fNodeTmp.ParentY)
+                            || ((_map.IsTileBlock(fNode.x - 1, fNode.y) || _map.IsTileBlock(fNode.x + 1, fNode.y)) 
+                                && fNode.y != _closedNodes[_closedNodes.Count - 1].y && fNode.x != _closedNodes[_closedNodes.Count - 1].x))
+                            _closedNodes.Add(fNode);
 
                         fPrevNode = fNode;
-						posX = fNodeTmp.PX;
-                        posY = fNodeTmp.PY;
+						posX = fNodeTmp.ParentX;
+                        posY = fNodeTmp.ParentY;
 						fPrevNodeTmp = fNodeTmp;
                         fNodeTmp = fNextNodeTmp;
-						loc = (fNodeTmp.PY << mGridXLog2) + fNodeTmp.PX;
-                        fNode = new Vector2i(posX, posY);
+						loc = (fNodeTmp.ParentY << _gridXLog2) + fNodeTmp.ParentX;
+                        fNode = new Vector2Int(posX, posY);
                     } 
 
-                    mClose.Add(fNode);
+                    _closedNodes.Add(fNode);
 
-                    mStopped = true;
+                    _stopped = true;
 
-                    return mClose;
+                    return _closedNodes;
                 }
-                mStopped = true;
+                _stopped = true;
                 return null;
             }
         }
-        #endregion
 
-        #region Inner Classes
+    #endregion
+
+    #region Inner Classes
+
         internal class ComparePFNodeMatrix : IComparer<Location>
         {
-            #region Variables Declaration
+
+        #region Variables Declaration
+
             List<PathFinderNodeFast>[] mMatrix;
-            #endregion
 
-            #region Constructors
-            public ComparePFNodeMatrix(List<PathFinderNodeFast>[] matrix)
-            {
+        #endregion
+
+        #region Constructors
+
+            public ComparePFNodeMatrix(List<PathFinderNodeFast>[] matrix) =>
                 mMatrix = matrix;
-            }
-            #endregion
 
-            #region IComparer Members
+        #endregion
+
+        #region IComparer Members
+
             public int Compare(Location a, Location b)
             {
-                if (mMatrix[a.xy][a.z].F > mMatrix[b.xy][b.z].F)
+                if (mMatrix[a.xy][a.z].FCost > mMatrix[b.xy][b.z].FCost)
                     return 1;
-                else if (mMatrix[a.xy][a.z].F < mMatrix[b.xy][b.z].F)
+                else if (mMatrix[a.xy][a.z].FCost < mMatrix[b.xy][b.z].FCost)
                     return -1;
+                
                 return 0;
             }
-            #endregion
-        }
+
         #endregion
+
+        }
+
+    #endregion
+
     }
 }

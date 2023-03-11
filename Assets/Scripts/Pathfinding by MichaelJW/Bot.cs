@@ -1,7 +1,4 @@
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using Algorithms;
 using UnityEngine.UI;
 
 public class Bot : Character
@@ -13,28 +10,22 @@ public class Bot : Character
 	}
 	
 	public BotAction mCurrentAction = BotAction.None;
-	
 	public Vector2 mDestination;
-	
 	public int mCurrentNodeId = -1;
-
 	public int mFramesOfJumping = 0;
 	public int mStuckFrames = 0;
-
     public int mMaxJumpHeight = 5;
     public int mWidth = 1;
     public int mHeight = 3;
 	
-	
 	public const int cMaxStuckFrames = 20;
 	
-	
-    public void TappedOnTile(Vector2i mapPos)
+    public void TappedOnTile(Vector2Int mapPos)
     {
-        while (!(mMap.IsGround(mapPos.x, mapPos.y)))
+        while (!(mMap.IsTileBlock(mapPos.x, mapPos.y)))
             --mapPos.y;
 
-        MoveTo(new Vector2i(mapPos.x, mapPos.y + 1));
+        MoveTo(new Vector2Int(mapPos.x, mapPos.y + 1));
     }
 
     public void BotInit(bool[] inputs, bool[] prevInputs)
@@ -92,34 +83,34 @@ public class Bot : Character
         mAABBOffset.y = mAABB.HalfSizeY;
     }
 
-    bool IsOnGroundAndFitsPos(Vector2i pos)
+    bool IsOnGroundAndFitsPos(Vector2Int pos)
     {
         for (int y = pos.y; y < pos.y + mHeight; ++y)
         {
             for (int x = pos.x; x < pos.x + mWidth; ++x)
             {
-                if (mMap.IsObstacle(x, y))
+                if (mMap.IsTileBlock(x, y))
                     return false;
             }
         }
 
         for (int x = pos.x; x < pos.x + mWidth; ++x)
         {
-            if (mMap.IsGround(x, pos.y - 1))
+            if (mMap.IsTileBlock(x, pos.y - 1))
                 return true;
         }
 
         return false;
     }
-    public void MoveTo(Vector2i destination)
+    public void MoveTo(Vector2Int destination)
     {
         mStuckFrames = 0;
 
-        Vector2i startTile = mMap.GetMapTileAtPoint(mAABB.Center - mAABB.HalfSize + Vector2.one * Map.cTileSize * 0.5f);
+        Vector2Int startTile = mMap.GetMapTileAtPoint(mAABB.Center - mAABB.HalfSize + Vector2.one * Map.cTileSize * 0.5f);
         
         if (mOnGround && !IsOnGroundAndFitsPos(startTile))
         {
-            if (IsOnGroundAndFitsPos(new Vector2i(startTile.x + 1, startTile.y)))
+            if (IsOnGroundAndFitsPos(new Vector2Int(startTile.x + 1, startTile.y)))
                 startTile.x += 1;
             else
                 startTile.x -= 1;
@@ -227,7 +218,7 @@ public class Bot : Character
         destOnGround = false;
         for (int x = mPath[mCurrentNodeId].x; x < mPath[mCurrentNodeId].x + mWidth; ++x)
         {
-            if (mMap.IsGround(x, mPath[mCurrentNodeId].y - 1))
+            if (mMap.IsTileBlock(x, mPath[mCurrentNodeId].y - 1))
             {
                 destOnGround = true;
                 break;
@@ -240,7 +231,7 @@ public class Bot : Character
         reachedY = ReachedNodeOnYAxis(pathPosition, prevDest, currentDest);
 
         //snap the character if it reached the goal but overshot it by more than cBotMaxPositionError
-        if (reachedX && Mathf.Abs(pathPosition.x - currentDest.x) > Constants.cBotMaxPositionError && Mathf.Abs(pathPosition.x - currentDest.x) < Constants.cBotMaxPositionError*3.0f && !mPrevInputs[(int)KeyInput.GoRight] && !mPrevInputs[(int)KeyInput.GoLeft])
+        if (reachedX && Mathf.Abs(pathPosition.x - currentDest.x) > Constants.cBotMaxPositionError && Mathf.Abs(pathPosition.x - currentDest.x) < Constants.cBotMaxPositionError*3.0f && !mPrevInputs[(int)KeyInput.Right] && !mPrevInputs[(int)KeyInput.Left])
         {
             pathPosition.x = currentDest.x;
             mPosition.x = pathPosition.x - Map.cTileSize * 0.5f + mAABB.HalfSizeX + mAABBOffset.x;
@@ -277,7 +268,7 @@ public class Bot : Character
             {
                 if (mPath[i].y - mPath[prevNodeId].y >= jumpHeight)
                     jumpHeight = mPath[i].y - mPath[prevNodeId].y;
-                if (mPath[i].y - mPath[prevNodeId].y < jumpHeight || mMap.IsGround(mPath[i].x, mPath[i].y - 1))
+                if (mPath[i].y - mPath[prevNodeId].y < jumpHeight || mMap.IsTileBlock(mPath[i].x, mPath[i].y - 1))
                     return GetJumpFrameCount(jumpHeight);
             }
         }
@@ -295,8 +286,6 @@ public class Bot : Character
 		mMap.GetMapTileAtPoint(position, out tileX, out tileY);
 		
 		int characterHeight = Mathf.CeilToInt(mAABB.HalfSizeY*2.0f/Map.cTileSize);
-
-        int dir;
 
         switch (mCurrentAction)
         {
@@ -319,8 +308,8 @@ public class Bot : Character
                 GetContext(out prevDest, out currentDest, out nextDest, out destOnGround, out reachedX, out reachedY);
                 Vector2 pathPosition = mAABB.Center - mAABB.HalfSize + Vector2.one * Map.cTileSize * 0.5f;
 
-                mInputs[(int)KeyInput.GoRight] = false;
-                mInputs[(int)KeyInput.GoLeft] = false;
+                mInputs[(int)KeyInput.Right] = false;
+                mInputs[(int)KeyInput.Left] = false;
                 mInputs[(int)KeyInput.Jump] = false;
                 mInputs[(int)KeyInput.GoDown] = false;
 
@@ -347,9 +336,9 @@ public class Bot : Character
                 else if (!reachedX)
                 {
                     if (currentDest.x - pathPosition.x > Constants.cBotMaxPositionError)
-                        mInputs[(int)KeyInput.GoRight] = true;
+                        mInputs[(int)KeyInput.Right] = true;
                     else if (pathPosition.x - currentDest.x > Constants.cBotMaxPositionError)
-                        mInputs[(int)KeyInput.GoLeft] = true;
+                        mInputs[(int)KeyInput.Left] = true;
                 }
                 else if (!reachedY && mPath.Count > mCurrentNodeId + 1 && !destOnGround)
                 {
@@ -368,9 +357,9 @@ public class Bot : Character
                     if (checkedX != 0 && !mMap.AnySolidBlockInStripe(checkedX, tileY, mPath[mCurrentNodeId + 1].y))
                     {
                         if (nextDest.x - pathPosition.x > Constants.cBotMaxPositionError)
-                            mInputs[(int)KeyInput.GoRight] = true;
+                            mInputs[(int)KeyInput.Right] = true;
                         else if (pathPosition.x - nextDest.x > Constants.cBotMaxPositionError)
-                            mInputs[(int)KeyInput.GoLeft] = true;
+                            mInputs[(int)KeyInput.Left] = true;
 
                         if (ReachedNodeOnXAxis(pathPosition, currentDest, nextDest) && ReachedNodeOnYAxis(pathPosition, currentDest, nextDest))
                         {

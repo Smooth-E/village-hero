@@ -1,17 +1,6 @@
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using Algorithms;
-using UnityEngine.UI;
-
-[System.Serializable]
-public enum TileType
-{
-    Empty,
-    Block,
-    OneWay
-}
 
 [System.Serializable]
 public partial class Map : MonoBehaviour 
@@ -36,14 +25,12 @@ public partial class Map : MonoBehaviour
 	/// <summary>
 	/// The nodes that are fed to pathfinder.
 	/// </summary>
-	[HideInInspector]
-	public byte[,] mGrid;
+	[HideInInspector] public byte[,] mGrid;
 	
 	/// <summary>
 	/// The map's tile data.
 	/// </summary>
-	[HideInInspector]
-	private TileType[,] tiles;
+	[HideInInspector] private TileType[,] tiles;
 
 	/// <summary>
 	/// The map's sprites.
@@ -64,6 +51,7 @@ public partial class Map : MonoBehaviour
 	/// The width of the map in tiles.
 	/// </summary>
 	public int mWidth = 50;
+
 	/// <summary>
 	/// The height of the map in tiles.
 	/// </summary>
@@ -88,61 +76,31 @@ public partial class Map : MonoBehaviour
     public RectTransform sliderHigh;
     public RectTransform sliderLow;
 
-	public TileType GetTile(int x, int y) 
-	{
-        if (x < 0 || x >= mWidth
-            || y < 0 || y >= mHeight)
-            return TileType.Block;
+    private bool IsTileOutsideOfGrid(int x, int y) =>
+        x < 0 || x >= mWidth || y < 0 || y >= mHeight;
 
-		return tiles[x, y]; 
-	}
+	public TileType GetTile(int x, int y) =>
+        IsTileOutsideOfGrid(x, y) ? TileType.Block : tiles[x, y];
 
-    public bool IsOneWayPlatform(int x, int y)
-    {
-        if (x < 0 || x >= mWidth
-            || y < 0 || y >= mHeight)
-            return false;
+    public bool IsTileOneWay(int x, int y) =>
+        IsTileOutsideOfGrid(x, y) ? false : tiles[x, y] == TileType.OneWay;
 
-        return (tiles[x, y] == TileType.OneWay);
-    }
+    public bool IsTileBlock(int x, int y) =>
+        IsTileOutsideOfGrid(x, y) ? false : tiles[x, y] == TileType.Block;
 
-    public bool IsGround(int x, int y)
-    {
-        if (x < 0 || x >= mWidth
-           || y < 0 || y >= mHeight)
-            return false;
-
-        return (tiles[x, y] == TileType.OneWay || tiles[x, y] == TileType.Block);
-    }
-
-    public bool IsObstacle(int x, int y)
-    {
-        if (x < 0 || x >= mWidth
-            || y < 0 || y >= mHeight)
-            return true;
-
-        return (tiles[x, y] == TileType.Block);
-    }
-
-    public bool IsNotEmpty(int x, int y)
-    {
-        if (x < 0 || x >= mWidth
-            || y < 0 || y >= mHeight)
-            return true;
-
-        return (tiles[x, y] != TileType.Empty);
-    }
+    public bool IsTileNotEmpty(int x, int y) =>
+        IsTileOutsideOfGrid(x, y) ? false : tiles[x, y] != TileType.Empty;
 
 	public void InitPathFinder()
 	{
 		mPathFinder = new PathFinderFast(mGrid, this);
 		
 		mPathFinder.Formula                 = HeuristicFormula.Manhattan;
-		//if false then diagonal movement will be prohibited
+		// If false then diagonal movement will be prohibited
         mPathFinder.Diagonals               = false;
-		//if true then diagonal movement will have higher cost
+		// If true then diagonal movement will have higher cost
         mPathFinder.HeavyDiagonals          = false;
-		//estimate of path length
+		// Estimate of path length
         mPathFinder.HeuristicEstimate       = 6;
         mPathFinder.PunishChangeDirection   = false;
         mPathFinder.TieBreaker              = false;
@@ -157,43 +115,37 @@ public partial class Map : MonoBehaviour
 		tileIndexX =(int)((point.x - position.x + cTileSize/2.0f)/(float)(cTileSize));
 	}
 	
-	public Vector2i GetMapTileAtPoint(Vector2 point)
-	{
-		return new Vector2i((int)((point.x - position.x + cTileSize/2.0f)/(float)(cTileSize)),
-					(int)((point.y - position.y + cTileSize/2.0f)/(float)(cTileSize)));
-	}
+	public Vector2Int GetMapTileAtPoint(Vector2 point) =>
+	    new Vector2Int(
+            (int) ((point.x - position.x + cTileSize/ 2f) / (float) cTileSize),
+            (int) ((point.y - position.y + cTileSize/ 2f) / (float) cTileSize)
+        );
 	
-	public Vector2 GetMapTilePosition(int tileIndexX, int tileIndexY)
-	{
-		return new Vector2(
+	public Vector2 GetMapTilePosition(int tileIndexX, int tileIndexY) =>
+        new Vector2(
 				(float) (tileIndexX * cTileSize) + position.x,
 				(float) (tileIndexY * cTileSize) + position.y
 			);
-	}
 
-	public Vector2 GetMapTilePosition(Vector2i tileCoords)
-	{
-		return new Vector2(
+	public Vector2 GetMapTilePosition(Vector2Int tileCoords) =>
+        new Vector2(
 			(float) (tileCoords.x * cTileSize) + position.x,
 			(float) (tileCoords.y * cTileSize) + position.y
 			);
-	}
 	
-	public bool CollidesWithMapTile(AABB aabb, int tileIndexX, int tileIndexY)
+	public bool CollidesWithMapTile(AxisAlignedBoundedBox aabb, int tileIndexX, int tileIndexY)
 	{
-		var tilePos = GetMapTilePosition (tileIndexX, tileIndexY);
-		
-		return aabb.Overlaps(tilePos, new Vector2( (float)(cTileSize)/2.0f, (float)(cTileSize)/2.0f));
+		var tilePosition = GetMapTilePosition(tileIndexX, tileIndexY);
+		return aabb.Overlaps(tilePosition, new Vector2(cTileSize / 2f, cTileSize / 2f));
 	}
 
-    public bool AnySolidBlockInRectangle(Vector2 start, Vector2 end)
-    {
-        return AnySolidBlockInRectangle(GetMapTileAtPoint(start), GetMapTileAtPoint(end));
-    }
+    public bool AnySolidBlockInRectangle(Vector2 start, Vector2 end) =>
+        AnySolidBlockInRectangle(GetMapTileAtPoint(start), GetMapTileAtPoint(end));
 
     public bool AnySolidBlockInStripe(int x, int y0, int y1)
     {
-        int startY, endY;
+        int startY;
+        int endY;
 
         if (y0 <= y1)
         {
@@ -215,9 +167,12 @@ public partial class Map : MonoBehaviour
         return false;
     }
 
-    public bool AnySolidBlockInRectangle(Vector2i start, Vector2i end)
+    public bool AnySolidBlockInRectangle(Vector2Int start, Vector2Int end)
     {
-        int startX, startY, endX, endY;
+        int startX;
+        int startY;
+        int endX;
+        int endY;
 
         if (start.x <= end.x)
         {
@@ -291,8 +246,6 @@ public partial class Map : MonoBehaviour
     {
         var mapRoom = mapRoomOneWay;
         mRandomNumber = new System.Random();
-
-        Application.targetFrameRate = 60;
         
         inputs = new bool[(int)KeyInput.Count];
         prevInputs = new bool[(int)KeyInput.Count];
@@ -306,7 +259,7 @@ public partial class Map : MonoBehaviour
         tiles = new TileType[mWidth, mHeight];
         tilesSprites = new SpriteRenderer[mapRoom.width, mapRoom.height];
 
-        mGrid = new byte[Mathf.NextPowerOfTwo((int)mWidth), Mathf.NextPowerOfTwo((int)mHeight)];
+        mGrid = new byte[Mathf.NextPowerOfTwo(mWidth), Mathf.NextPowerOfTwo(mHeight)];
         InitPathFinder();
 
         Camera.main.orthographicSize = Camera.main.pixelHeight / 2;
@@ -340,15 +293,6 @@ public partial class Map : MonoBehaviour
             tiles[x, mHeight - 2] = TileType.Block;
         }
 
-        /*for (int y = 2; y < mHeight - 2; ++y)
-        {
-            for (int x = 2; x < mWidth - 2; ++x)
-            {
-                if (y < mHeight/4)
-                    SetTile(x, y, TileType.Block);
-            }
-        }*/
-
         player.BotInit(inputs, prevInputs);
         player.mMap = this;
         player.mPosition = new Vector2(2 * Map.cTileSize, (mHeight / 2) * Map.cTileSize + player.mAABB.HalfSizeY);
@@ -356,8 +300,8 @@ public partial class Map : MonoBehaviour
 
     void Update()
     {
-        inputs[(int)KeyInput.GoRight] = Input.GetKey(goRightKey);
-        inputs[(int)KeyInput.GoLeft] = Input.GetKey(goLeftKey);
+        inputs[(int)KeyInput.Right] = Input.GetKey(goRightKey);
+        inputs[(int)KeyInput.Left] = Input.GetKey(goLeftKey);
         inputs[(int)KeyInput.GoDown] = Input.GetKey(goDownKey);
         inputs[(int)KeyInput.Jump] = Input.GetKey(goJumpKey);
 
@@ -385,7 +329,7 @@ public partial class Map : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
-            player.TappedOnTile(new Vector2i(mouseTileX, mouseTileY));
+            player.TappedOnTile(new Vector2Int(mouseTileX, mouseTileY));
             Debug.Log(mouseTileX + "  " + mouseTileY);
         }
 
@@ -393,7 +337,7 @@ public partial class Map : MonoBehaviour
         {
             if (mouseTileX != lastMouseTileX || mouseTileY != lastMouseTileY || Input.GetKeyDown(KeyCode.Mouse1) || Input.GetKeyDown(KeyCode.Mouse2))
             {
-                if (!IsNotEmpty(mouseTileX, mouseTileY))
+                if (!IsTileNotEmpty(mouseTileX, mouseTileY))
                     SetTile(mouseTileX, mouseTileY, Input.GetKey(KeyCode.Mouse1) ? TileType.Block : TileType.OneWay);
                 else
                     SetTile(mouseTileX, mouseTileY, TileType.Empty);
