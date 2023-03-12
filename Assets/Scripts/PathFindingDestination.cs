@@ -3,6 +3,6 @@ using System;
 [Serializable]
 public class PathFindingDestination
 {
-    public Platform DestinationPlatform;
+    public PlatformArea DestinationPlatformArea;
     public PathFindingAction Action;
 }

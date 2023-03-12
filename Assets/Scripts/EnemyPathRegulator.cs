@@ -9,9 +9,9 @@ public class EnemyPathRegulator : MonoBehaviour
     private const float TargetCheckInterval = 0.01f;
     
     private Coroutine _currentActionCoroutine = null;
-    private Platform _currentPlatform = null;
+    private PlatformArea _currentPlatformArea = null;
 
-    private Platform _tempHighlightPlatform = null;
+    private PlatformArea _tempHighlightPlatformArea = null;
     private List<PathFindingNode> _tempLastPath = null;
 
     [SerializeField] private Transform _originTransform;
@@ -31,26 +31,26 @@ public class EnemyPathRegulator : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        if (_tempHighlightPlatform == null || _tempLastPath == null || !Application.isPlaying)
+        if (_tempHighlightPlatformArea == null || _tempLastPath == null || !Application.isPlaying)
             return;
         
         Gizmos.color = Color.yellow;
-        Gizmos.DrawCube(_tempHighlightPlatform.transform.position, Vector3.one);
+        Gizmos.DrawCube(_tempHighlightPlatformArea.transform.position, Vector3.one);
         
         Gizmos.color = Color.green;
         for (int i = 0; i < _tempLastPath.Count - 1; i++)
         {
-            Gizmos.DrawLine(_tempLastPath[i].LinkedPlatform.transform.position, _tempLastPath[i + 1].LinkedPlatform.transform.position);
-            Gizmos.DrawWireSphere(_tempLastPath[i + 1].LinkedPlatform.transform.position, 1.2f);
+            Gizmos.DrawLine(_tempLastPath[i].LinkedPlatformArea.transform.position, _tempLastPath[i + 1].LinkedPlatformArea.transform.position);
+            Gizmos.DrawWireSphere(_tempLastPath[i + 1].LinkedPlatformArea.transform.position, 1.2f);
         }
     }
 
-    private void OnGrounded(Platform platform) =>
-        _currentPlatform = platform;
+    private void OnGrounded(PlatformArea platformArea) =>
+        _currentPlatformArea = platformArea;
 
     private IEnumerator TargetCheckCoroutine()
     {
-        yield return new WaitUntil(() => _currentPlatform != null);
+        yield return new WaitUntil(() => _currentPlatformArea != null);
         Debug.Log("Started patrolling!");
 
         while (true)
@@ -83,15 +83,15 @@ public class EnemyPathRegulator : MonoBehaviour
         Debug.Log("Selecting closest platform!");
 
         float closestDistance = -1;
-        Platform closestPlatform = null;
+        PlatformArea closestPlatformArea = null;
 
-        foreach (var platform in PlayerInfo.ReachableFromPlatforms)
+        foreach (var platform in PlayerInfo.ReachableFromPlatformAreas)
         {
             var currentDistance = Vector2.Distance(_originTransform.position, platform.transform.position);
 
-            if (platform != _currentPlatform && (closestDistance == -1 || closestDistance > currentDistance))
+            if (platform != _currentPlatformArea && (closestDistance == -1 || closestDistance > currentDistance))
             {
-                closestPlatform = platform;
+                closestPlatformArea = platform;
                 closestDistance = currentDistance;
             }
         }
@@ -101,7 +101,7 @@ public class EnemyPathRegulator : MonoBehaviour
         if (closestDistance == -1)
             _currentActionCoroutine = StartCoroutine(HangAroundCoroutine());
         else
-            _currentActionCoroutine = StartCoroutine(MoveToPlatformCoroutine(closestPlatform));
+            _currentActionCoroutine = StartCoroutine(MoveToPlatformCoroutine(closestPlatformArea));
     }
 
     private void StopCurrentAction()
@@ -113,9 +113,9 @@ public class EnemyPathRegulator : MonoBehaviour
         }
     }
 
-    private IEnumerator MoveToPlatformCoroutine(Platform destinationPlatform)
+    private IEnumerator MoveToPlatformCoroutine(PlatformArea destinationPlatformArea)
     {
-        var path = PathFinder.FindPath(_currentPlatform, destinationPlatform);
+        var path = PathFinder.FindPath(_currentPlatformArea, destinationPlatformArea);
         _tempLastPath = path;
 
         if (path == null || path.Count == 0)
@@ -126,27 +126,27 @@ public class EnemyPathRegulator : MonoBehaviour
 
         for (var i = 0; i < path.Count - 1; i++)
         {
-            var currentPlatform = path[i].LinkedPlatform;
-            var nextPlatform = path[i + 1].LinkedPlatform;
+            var currentPlatform = path[i].LinkedPlatformArea;
+            var nextPlatform = path[i + 1].LinkedPlatformArea;
             var action = currentPlatform.GetActionForDestination(nextPlatform);
 
             IEnumerator behaviour = null;
             switch (action)
             {
                 case PathFindingAction.FallFromRightEdge:
-                    behaviour = FallFromEdge(_currentPlatform.RightEdge);
+                    behaviour = FallFromEdge(_currentPlatformArea.RightEdge);
                     break;
                 case PathFindingAction.FallFromLeftEdge:
-                    behaviour = FallFromEdge(_currentPlatform.LeftEdge);
+                    behaviour = FallFromEdge(_currentPlatformArea.LeftEdge);
                     break;
                 case PathFindingAction.FallFromAnyEdge:
                     behaviour = FallFromEdge(GetClosestEdge());
                     break;
                 case PathFindingAction.JumpFromRightEdge:
-                    behaviour = JumpFromEdge(_currentPlatform.RightEdge);
+                    behaviour = JumpFromEdge(_currentPlatformArea.RightEdge);
                     break;
                 case PathFindingAction.JumpFromLeftEdge:
-                    behaviour = JumpFromEdge(_currentPlatform.LeftEdge);
+                    behaviour = JumpFromEdge(_currentPlatformArea.LeftEdge);
                     break;
                 case PathFindingAction.JumpFromAnyEdge:
                     behaviour = JumpFromEdge(GetClosestEdge());
@@ -157,7 +157,7 @@ public class EnemyPathRegulator : MonoBehaviour
             }
             Debug.Log($"Selected action: {action}");
 
-            _tempHighlightPlatform = nextPlatform;
+            _tempHighlightPlatformArea = nextPlatform;
 
             while (behaviour.MoveNext())
                 yield return behaviour.Current;
@@ -169,10 +169,10 @@ public class EnemyPathRegulator : MonoBehaviour
     private float GetClosestEdge()
     {
         var currentX = transform.position.x;
-        if (Mathf.Abs(currentX - _currentPlatform.LeftEdge) > Mathf.Abs(currentX - _currentPlatform.RightEdge))
-            return _currentPlatform.RightEdge;
+        if (Mathf.Abs(currentX - _currentPlatformArea.LeftEdge) > Mathf.Abs(currentX - _currentPlatformArea.RightEdge))
+            return _currentPlatformArea.RightEdge;
         else
-            return _currentPlatform.LeftEdge;
+            return _currentPlatformArea.LeftEdge;
     }
 
     private IEnumerator MoveToThePointX(float destinationX)
@@ -190,15 +190,15 @@ public class EnemyPathRegulator : MonoBehaviour
         while (enumerator.MoveNext())
             yield return enumerator.Current;
 
-        var oldPlatform = _currentPlatform;
+        var oldPlatform = _currentPlatformArea;
         _mover.Jump();
-        yield return new WaitUntil(() => _currentPlatform != oldPlatform);
+        yield return new WaitUntil(() => _currentPlatformArea != oldPlatform);
 
         yield return new WaitForSeconds(Random.Range(0.1f, 0.2f));
         _mover.HorizontalVelocity = 0;
     }
 
-    private IEnumerator JumpAnywhere(Platform destination)
+    private IEnumerator JumpAnywhere(PlatformArea destination)
     {
         Debug.Log("Jumping anywhere!");
         
@@ -211,8 +211,8 @@ public class EnemyPathRegulator : MonoBehaviour
 
         _mover.Jump();
         _mover.HorizontalVelocity = direction * 0.5f;
-        var oldPlatform = _currentPlatform;
-        yield return new WaitUntil(() => _currentPlatform != oldPlatform);
+        var oldPlatform = _currentPlatformArea;
+        yield return new WaitUntil(() => _currentPlatformArea != oldPlatform);
 
         yield return new WaitForSeconds(Random.Range(0.1f, 0.2f));
         _mover.HorizontalVelocity = 0;
@@ -226,8 +226,8 @@ public class EnemyPathRegulator : MonoBehaviour
         while (enumerator.MoveNext())
             yield return enumerator.Current;
 
-        var oldPlatform = _currentPlatform;
-        yield return new WaitUntil(() => _currentPlatform != oldPlatform);
+        var oldPlatform = _currentPlatformArea;
+        yield return new WaitUntil(() => _currentPlatformArea != oldPlatform);
 
         _mover.HorizontalVelocity = 0;
     }
@@ -240,9 +240,9 @@ public class EnemyPathRegulator : MonoBehaviour
             _mover.HorizontalVelocity = direction;
 
             if (direction > 0)
-                yield return new WaitUntil(() => transform.position.x > _currentPlatform.RightEdge);
+                yield return new WaitUntil(() => transform.position.x > _currentPlatformArea.RightEdge);
             else
-                yield return new WaitUntil(() => transform.position.x < _currentPlatform.LeftEdge);
+                yield return new WaitUntil(() => transform.position.x < _currentPlatformArea.LeftEdge);
 
             direction = -direction;
         }

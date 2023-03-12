@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public static class PathFinder
 {
     
-    public static List<PathFindingNode> FindPath(Platform start, Platform destination)
+    public static List<PathFindingNode> FindPath(PlatformArea start, PlatformArea destination)
     {
         PathFindingGraph.Initialize();
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 [Serializable]
 [RequireComponent(typeof(BoxCollider2D))]
-public class Platform : MonoBehaviour
+public class PlatformArea : MonoBehaviour
 {
 
     [SerializeField] private List<PathFindingDestination> _possibleDestinations;
@@ -24,14 +24,14 @@ public class Platform : MonoBehaviour
         RightEdge = transform.position.x + areaWidth / 2f;
     }
 
-    public PathFindingAction GetActionForDestination(Platform destinationPlatform)
+    public PathFindingAction GetActionForDestination(PlatformArea destinationPlatformArea)
     {
         PathFindingAction action = 0;
         bool platformFound = false;
 
         foreach (var destination in _possibleDestinations)
         {
-            if (destination.DestinationPlatform != destinationPlatform)
+            if (destination.DestinationPlatformArea != destinationPlatformArea)
                 continue;
             
             action = destination.Action;

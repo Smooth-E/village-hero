@@ -5,9 +5,9 @@ public class PlayerInfo : MonoBehaviour
 {
 
     [SerializeField] private CharacterGrounder _grounder;
-    public static Platform CurrentPlatform { private set; get; }
+    public static PlatformArea CurrentPlatform { private set; get; }
     public static Vector2 Position { private set; get; }
-    public static List<Platform> ReachableFromPlatforms { private set; get; } = new List<Platform>();
+    public static List<PlatformArea> ReachableFromPlatformAreas { private set; get; } = new List<PlatformArea>();
 
     private void Awake() =>
         _grounder.OnGrounded += OnGrounded;
@@ -21,8 +21,8 @@ public class PlayerInfo : MonoBehaviour
     private void OnDestroy() =>
         _grounder.OnGrounded -= OnGrounded;
 
-    private void OnGrounded(Platform platform) =>
-        CurrentPlatform = platform;
+    private void OnGrounded(PlatformArea platformArea) =>
+        CurrentPlatform = platformArea;
 
     private void OnDrawGizmos()
     {
@@ -30,17 +30,17 @@ public class PlayerInfo : MonoBehaviour
             return;
         
         Gizmos.color = Color.cyan;
-        foreach (var platform in ReachableFromPlatforms)
+        foreach (var platform in ReachableFromPlatformAreas)
             Gizmos.DrawSphere(platform.transform.position, 0.3f);
     }
 
     private void GetReachablePlatforms()
     {
-        ReachableFromPlatforms = new List<Platform>();
+        ReachableFromPlatformAreas = new List<PlatformArea>();
         
         for (var angle = 0; angle < 360; angle += 5)
         {
-            var layerMask = LayerMask.GetMask(new string[]{ "Platform", "Platform Area" });
+            var layerMask = LayerMask.GetMask(new string[]{ "Platform", "Platform Area", "Obstacle" });
             var rayDirection = Quaternion.Euler(0, 0, angle) * Vector2.up;
 
             if (angle % 3 == 0)
@@ -50,13 +50,13 @@ public class PlayerInfo : MonoBehaviour
 
             for (var index = 0; index < hits.Length; index++)
             {
-                Platform platform = null;
+                PlatformArea platformArea = null;
 
-                if (!hits[index].collider.TryGetComponent<Platform>(out platform))
+                if (!hits[index].collider.TryGetComponent<PlatformArea>(out platformArea))
                     break;
                 
-                if (!ReachableFromPlatforms.Contains(platform))
-                    ReachableFromPlatforms.Add(platform);
+                if (!ReachableFromPlatformAreas.Contains(platformArea))
+                    ReachableFromPlatformAreas.Add(platformArea);
             }
         }
 
