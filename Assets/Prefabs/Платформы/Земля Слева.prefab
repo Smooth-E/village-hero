@@ -47,7 +47,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 3.1729107, y: 0.5433701}
+  m_Offset: {x: 4.0161085, y: 0.5433701}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -58,7 +58,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 18.43277, y: 2.8890853}
+  m_Size: {x: 16.746374, y: 2.8890853}
   m_EdgeRadius: 0
 --- !u!114 &7463173166677780543
 MonoBehaviour:
@@ -163,7 +163,7 @@ Transform:
   - {fileID: 7463173166740790865}
   - {fileID: 7463173166677780541}
   m_Father: {fileID: 7463173167500316640}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7463173167500316652
 GameObject:
@@ -196,8 +196,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7463173167439866160}
   - {fileID: 7463173168229279048}
+  - {fileID: 7463173167439866160}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -318,7 +318,7 @@ GameObject:
   - component: {fileID: 7463173167666712047}
   m_Layer: 6
   m_Name: "\u041B\u0435\u0432\u0430\u044F \u0442\u0435\u0440\u0440\u0438\u0442\u043E\u0440\u0438\u044F
-    \u0437\u0435\u043C\u043B\u0438 \u0441\u043F\u0440\u0432\u0430"
+    \u0437\u0435\u043C\u043B\u0438 \u0441\u043B\u0435\u0432\u0430"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -390,7 +390,7 @@ GameObject:
   - component: {fileID: 7463173167678996453}
   m_Layer: 7
   m_Name: "\u041B\u0435\u0432\u0430\u044F \u043F\u043B\u0430\u0442\u0444\u043E\u0440\u043C\u0430
-    \u0437\u0435\u043C\u043B\u0438 \u0441\u043F\u0440\u0432\u0430"
+    \u0437\u0435\u043C\u043B\u0438 \u0441\u043B\u0435\u0432\u0430"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -468,5 +468,5 @@ Transform:
   - {fileID: 7463173167666712045}
   - {fileID: 7463173167678996450}
   m_Father: {fileID: 7463173167500316640}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

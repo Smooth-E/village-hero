@@ -19,7 +19,7 @@ public class CharacterGrounder : MonoBehaviour
         var nowGrounded = collider != null;
 
         if (nowGrounded != IsGrounded && nowGrounded)
-            OnGrounded?.Invoke(collider.GetComponentInChildren<PlatformArea>());
+            OnGrounded?.Invoke(collider.transform.parent.GetComponentInChildren<PlatformArea>());
 
         IsGrounded = nowGrounded;
     }

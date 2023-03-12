@@ -5,6 +5,13 @@ using UnityEngine;
 public class EnemyPathRegulator : MonoBehaviour
 {
 
+    private enum ActionType
+    {
+        None,
+        Traveling,
+        HangingOut
+    }
+
     private const float PlayerHeight = 1;
     private const float TargetCheckInterval = 0.01f;
     
@@ -13,6 +20,7 @@ public class EnemyPathRegulator : MonoBehaviour
 
     private PlatformArea _tempHighlightPlatformArea = null;
     private List<PathFindingNode> _tempLastPath = null;
+    private ActionType _currentActionType = ActionType.None; 
 
     [SerializeField] private Transform _originTransform;
     [SerializeField] private CharacterGrounder _grounder;
@@ -43,6 +51,9 @@ public class EnemyPathRegulator : MonoBehaviour
             Gizmos.DrawLine(_tempLastPath[i].LinkedPlatformArea.transform.position, _tempLastPath[i + 1].LinkedPlatformArea.transform.position);
             Gizmos.DrawWireSphere(_tempLastPath[i + 1].LinkedPlatformArea.transform.position, 1.2f);
         }
+
+        Gizmos.color = TargetAvailable ? Color.green : Color.red;
+        Gizmos.DrawSphere(transform.position + Vector3.up * 2, 0.5f);
     }
 
     private void OnGrounded(PlatformArea platformArea) =>
@@ -66,12 +77,12 @@ public class EnemyPathRegulator : MonoBehaviour
         var direction = (PlayerInfo.Position - origin).normalized;
 
         var distance = Vector2.Distance(origin, PlayerInfo.Position);
-        var mask = LayerMask.GetMask(new string[]{ "Platform", "Player" });
+        var mask = LayerMask.GetMask(new string[]{ "Obstacle", "Player" });
         var hit = Physics2D.Raycast(_originTransform.position, direction, distance, mask);
         Debug.DrawRay(origin, direction * distance, Color.magenta);
 
         var newTargetStatus =  hit.collider != null && hit.collider.CompareTag("Player");
-        var requiresAction = TargetAvailable != newTargetStatus && !newTargetStatus;
+        var requiresAction = !newTargetStatus && _currentActionType != ActionType.Traveling;
         TargetAvailable = newTargetStatus;
 
         if (requiresAction)
@@ -96,16 +107,16 @@ public class EnemyPathRegulator : MonoBehaviour
             }
         }
 
-        StopCurrentAction();
 
-        if (closestDistance == -1)
+        if (closestDistance == -1 && _currentActionType != ActionType.HangingOut)
             _currentActionCoroutine = StartCoroutine(HangAroundCoroutine());
-        else
+        else if (closestDistance != -1)
             _currentActionCoroutine = StartCoroutine(MoveToPlatformCoroutine(closestPlatformArea));
     }
 
     private void StopCurrentAction()
     {
+        _currentActionType = ActionType.None;
         if (_currentActionCoroutine != null)
         {
             StopCoroutine(_currentActionCoroutine);
@@ -115,6 +126,7 @@ public class EnemyPathRegulator : MonoBehaviour
 
     private IEnumerator MoveToPlatformCoroutine(PlatformArea destinationPlatformArea)
     {
+
         var path = PathFinder.FindPath(_currentPlatformArea, destinationPlatformArea);
         _tempLastPath = path;
 
@@ -123,6 +135,9 @@ public class EnemyPathRegulator : MonoBehaviour
             _currentActionCoroutine = StartCoroutine(HangAroundCoroutine());
             yield break;
         }
+
+        StopCurrentAction();
+        _currentActionType = ActionType.Traveling;
 
         for (var i = 0; i < path.Count - 1; i++)
         {
@@ -164,6 +179,8 @@ public class EnemyPathRegulator : MonoBehaviour
             
             yield return null;
         }
+
+        _currentActionType = ActionType.None;
     }
 
     private float GetClosestEdge()
@@ -194,7 +211,6 @@ public class EnemyPathRegulator : MonoBehaviour
         _mover.Jump();
         yield return new WaitUntil(() => _currentPlatformArea != oldPlatform);
 
-        yield return new WaitForSeconds(Random.Range(0.1f, 0.2f));
         _mover.HorizontalVelocity = 0;
     }
 
@@ -234,6 +250,10 @@ public class EnemyPathRegulator : MonoBehaviour
 
     private IEnumerator HangAroundCoroutine()
     {
+        StopCurrentAction();
+        _currentActionType = ActionType.HangingOut;
+        _tempLastPath = null;
+
         var direction = Random.Range(0, 2) == 0 ? 0.5f : -0.5f;
         while (true)
         {

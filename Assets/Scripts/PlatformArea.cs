@@ -20,8 +20,9 @@ public class PlatformArea : MonoBehaviour
         AreaCollider = GetComponent<BoxCollider2D>();
         var colliderSize = AreaCollider.size;
         var areaWidth = colliderSize.x * transform.localScale.x;
-        LeftEdge = transform.position.x - areaWidth / 2f;
-        RightEdge = transform.position.x + areaWidth / 2f;
+        var areaOffset = AreaCollider.offset;
+        LeftEdge = transform.position.x + areaOffset.x - areaWidth / 2f;
+        RightEdge = transform.position.x + areaOffset.x + areaWidth / 2f;
     }
 
     public PathFindingAction GetActionForDestination(PlatformArea destinationPlatformArea)
