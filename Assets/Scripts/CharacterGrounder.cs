@@ -15,8 +15,7 @@ public class CharacterGrounder : MonoBehaviour
     {
         var layerMask = LayerMask.GetMask(new string[]{ "Platform" });
         var collider = Physics2D.OverlapCircle(transform.position, _circleRadius, layerMask);
-
-        Debug.Log($"Collider: {collider == null}");
+        
         var nowGrounded = collider != null;
 
         if (nowGrounded != IsGrounded && nowGrounded)

@@ -4,10 +4,12 @@ using UnityEngine;
 public class PlayerInfo : MonoBehaviour
 {
 
-    [SerializeField] private CharacterGrounder _grounder;
     public static PlatformArea CurrentPlatform { private set; get; }
     public static Vector2 Position { private set; get; }
     public static List<PlatformArea> ReachableFromPlatformAreas { private set; get; } = new List<PlatformArea>();
+
+    [SerializeField] private CharacterGrounder _grounder;
+    [SerializeField] private bool _drawDebugRays = true;
 
     private void Awake() =>
         _grounder.OnGrounded += OnGrounded;
@@ -16,6 +18,11 @@ public class PlayerInfo : MonoBehaviour
     {
         Position = transform.position;
         GetReachablePlatforms();
+
+        string s = "";
+        foreach (var area in ReachableFromPlatformAreas)
+            s += area.name + "\n";
+        Debug.Log(s);
     }
     
     private void OnDestroy() =>
@@ -43,7 +50,7 @@ public class PlayerInfo : MonoBehaviour
             var layerMask = LayerMask.GetMask(new string[]{ "Platform", "Platform Area", "Obstacle" });
             var rayDirection = Quaternion.Euler(0, 0, angle) * Vector2.up;
 
-            if (angle % 3 == 0)
+            if (_drawDebugRays && angle % 3 == 0)
                 Debug.DrawRay(Position, rayDirection * 100f, Color.red);
             
             var hits = Physics2D.RaycastAll(Position, rayDirection, 100f, layerMask);
@@ -52,7 +59,7 @@ public class PlayerInfo : MonoBehaviour
             {
                 PlatformArea platformArea = null;
 
-                if (!hits[index].collider.TryGetComponent<PlatformArea>(out platformArea))
+                if (!hits[index].collider.IsTouchingLayers(LayerMask.GetMask(new string[]{ "Platform Area" })))
                     break;
                 
                 if (!ReachableFromPlatformAreas.Contains(platformArea))
