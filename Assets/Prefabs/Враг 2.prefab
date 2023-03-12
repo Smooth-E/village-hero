@@ -381,6 +381,7 @@ GameObject:
   - component: {fileID: 7723438230662544220}
   - component: {fileID: 5554489783350899008}
   - component: {fileID: 6674453945703029546}
+  - component: {fileID: 1027113576634676991}
   m_Layer: 0
   m_Name: "\u0412\u0440\u0430\u0433 2"
   m_TagString: Untagged
@@ -523,6 +524,22 @@ MonoBehaviour:
   _targetFinder: {fileID: 5554489783350899008}
   _shoulderTransform: {fileID: 2409595945738597181}
   _gunRotator: {fileID: 7585796192827460995}
+--- !u!114 &1027113576634676991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7806145813187372494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29a82d7238f3c59438829075cf9a04a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxHealth: 5
+  _canHeal: 0
+  _healTag: Heal
+  _badProjectile: Player's Projectile
 --- !u!1 &7806145813725191568
 GameObject:
   m_ObjectHideFlags: 0
