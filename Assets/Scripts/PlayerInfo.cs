@@ -18,11 +18,6 @@ public class PlayerInfo : MonoBehaviour
     {
         Position = transform.position;
         GetReachablePlatforms();
-
-        string s = "";
-        foreach (var area in ReachableFromPlatformAreas)
-            s += area.name + "\n";
-        Debug.Log(s);
     }
     
     private void OnDestroy() =>
@@ -47,7 +42,7 @@ public class PlayerInfo : MonoBehaviour
         
         for (var angle = 0; angle < 360; angle += 5)
         {
-            var layerMask = LayerMask.GetMask(new string[]{ "Platform", "Platform Area", "Obstacle" });
+            var layerMask = LayerMask.GetMask(new string[]{ "Platform Area", "Obstacle" });
             var rayDirection = Quaternion.Euler(0, 0, angle) * Vector2.up;
 
             if (_drawDebugRays && angle % 3 == 0)
@@ -57,11 +52,10 @@ public class PlayerInfo : MonoBehaviour
 
             for (var index = 0; index < hits.Length; index++)
             {
-                PlatformArea platformArea = null;
-
-                if (!hits[index].collider.IsTouchingLayers(LayerMask.GetMask(new string[]{ "Platform Area" })))
+                if (hits[index].collider.CompareTag("Obstacle"))
                     break;
                 
+                PlatformArea platformArea = hits[index].collider.GetComponent<PlatformArea>();
                 if (!ReachableFromPlatformAreas.Contains(platformArea))
                     ReachableFromPlatformAreas.Add(platformArea);
             }
