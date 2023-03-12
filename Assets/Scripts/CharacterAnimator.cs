@@ -13,6 +13,7 @@ public class CharacterAnimator : MonoBehaviour
     
     [SerializeField] private CharacterMover _mover;
     [SerializeField] private CharacterGrounder _grounder;
+    [SerializeField] private ITargetFinder _targetFinder;
 
     private void Start()
     {
@@ -25,12 +26,17 @@ public class CharacterAnimator : MonoBehaviour
         _animator.SetBool(_parameterRunning, _mover.HorizontalVelocity != 0);
         _animator.SetBool(_parameterGrounded, _grounder.IsGrounded);
         _animator.SetFloat(_parameterHorizontalVelocity, _mover.HorizontalVelocity);
-    
-        if (_mover.HorizontalVelocity == 0)
-            return;
 
         var currentScale = transform.localScale;
-        currentScale.x = Mathf.Abs(currentScale.x) * -Mathf.Sign(_mover.HorizontalVelocity);
+
+        var target = _targetFinder.GetTargetTransform();
+        var scaleX = 1;
+        if (target == null)
+            scaleX = (int) -Mathf.Sign(_mover.HorizontalVelocity);
+        else if (target.position.x > transform.position.x)
+            scaleX = -1;
+
+        currentScale.x = Mathf.Abs(currentScale.x) * scaleX;
         transform.localScale = currentScale;
     }
 

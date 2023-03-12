@@ -25,6 +25,7 @@ public class EnemyPathRegulator : MonoBehaviour
     [SerializeField] private Transform _originTransform;
     [SerializeField] private CharacterGrounder _grounder;
     [SerializeField] private CharacterMover _mover;
+    [SerializeField] private EnemyTargetFinder _targetFinder;
 
     public bool TargetAvailable { private set; get; } = true;
 
@@ -73,15 +74,7 @@ public class EnemyPathRegulator : MonoBehaviour
 
     private void GetToTargetIfNeeded()
     {
-        var origin = new Vector2(_originTransform.position.x, _originTransform.position.y);
-        var direction = (PlayerInfo.Position - origin).normalized;
-
-        var distance = Vector2.Distance(origin, PlayerInfo.Position);
-        var mask = LayerMask.GetMask(new string[]{ "Obstacle", "Player" });
-        var hit = Physics2D.Raycast(_originTransform.position, direction, distance, mask);
-        Debug.DrawRay(origin, direction * distance, Color.magenta);
-
-        var newTargetStatus =  hit.collider != null && hit.collider.CompareTag("Player");
+        var newTargetStatus = _targetFinder.GetTargetTransform() != null;
         var requiresAction = !newTargetStatus && _currentActionType != ActionType.Traveling;
         TargetAvailable = newTargetStatus;
 
