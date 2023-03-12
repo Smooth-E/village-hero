@@ -17,7 +17,7 @@ public class PathFindingNode
         var list = new List<PathFindingNode>();
 
         foreach (var destination in LinkedPlatform.PossibleDestinations)
-            list.Add(new PathFindingNode(destination.DestinationPlatform));
+            list.Add(PathFindingGraph.Nodes[destination.DestinationPlatform]);
 
         return list;
     }

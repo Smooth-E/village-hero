@@ -1,3 +1,4 @@
+using UnityEngine;
 using System.Collections.Generic;
 
 public static class PathFinder
@@ -5,11 +6,13 @@ public static class PathFinder
     
     public static List<PathFindingNode> FindPath(Platform start, Platform destination)
     {
-        var startNode = new PathFindingNode(start);
-        var destinationNode = new PathFindingNode(destination);
+        PathFindingGraph.Initialize();
+
+        var startNode = PathFindingGraph.Nodes[start];
+        var destinationNode = PathFindingGraph.Nodes[destination];
 
         var openList = new List<PathFindingNode>();
-        var visitedSet = new HashSet<PathFindingNode>();
+        var visitedNodes = new HashSet<PathFindingNode>();
 
         openList.Add(startNode);
 
@@ -29,14 +32,17 @@ public static class PathFinder
             }
 
             openList.Remove(currentNode);
-            visitedSet.Add(currentNode);
+            visitedNodes.Add(currentNode);
 
             if (currentNode == destinationNode)
                 return CreateFinalPath(startNode, destinationNode);
 
-            foreach (var neighboringNode in currentNode.GetNeighboringNodes())
+            var neighboringNodes = currentNode.GetNeighboringNodes();
+            Debug.Log($"Found neighboring nodes: {neighboringNodes.Count}");
+
+            foreach (var neighboringNode in neighboringNodes)
             {
-                if (visitedSet.Contains(neighboringNode))
+                if (visitedNodes.Contains(neighboringNode))
                     continue;
                 
                 // Мы не будем использовать вычисление Манхеттенской длины, 
@@ -70,6 +76,7 @@ public static class PathFinder
         }
 
         path.Reverse();
+        Debug.Log($"Final path length: {path.Count}");
         return path;
     }
 

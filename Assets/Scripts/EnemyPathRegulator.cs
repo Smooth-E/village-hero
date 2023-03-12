@@ -64,7 +64,7 @@ public class EnemyPathRegulator : MonoBehaviour
         {
             var currentDistance = Vector2.Distance(_originTransform.position, platform.transform.position);
 
-            if (closestDistance == -1 || closestDistance > currentDistance)
+            if (platform != _currentPlatform && (closestDistance == -1 || closestDistance > currentDistance))
             {
                 closestPlatform = platform;
                 closestDistance = currentDistance;
