@@ -33,7 +33,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -47,7 +47,7 @@ TextureImporter:
   spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 400
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -132,10 +132,10 @@ TextureImporter:
       name: "\u041F\u043B\u0430\u0442\u0444\u043E\u0440\u043C\u0430 1"
       rect:
         serializedVersion: 2
-        x: 797
-        y: 709
-        width: 463
-        height: 372
+        x: 3188
+        y: 2836
+        width: 1852
+        height: 1488
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -153,10 +153,10 @@ TextureImporter:
       name: "\u041F\u043B\u0430\u0442\u0444\u043E\u0440\u043C\u0430 2"
       rect:
         serializedVersion: 2
-        x: 2821
-        y: 340
-        width: 481
-        height: 413
+        x: 11284
+        y: 1360
+        width: 1924
+        height: 1652
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -174,10 +174,10 @@ TextureImporter:
       name: "\u041F\u043B\u0430\u0442\u0444\u043E\u0440\u043C\u0430 3"
       rect:
         serializedVersion: 2
-        x: 3753
-        y: 668
-        width: 466
-        height: 413
+        x: 15012
+        y: 2672
+        width: 1864
+        height: 1652
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -197,8 +197,8 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 2490
-        height: 492
+        width: 9960
+        height: 1968
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -216,10 +216,10 @@ TextureImporter:
       name: "\u0417\u0435\u043C\u043B\u044F \u0421\u043F\u0440\u0430\u0432\u0430"
       rect:
         serializedVersion: 2
-        x: 3539
+        x: 14156
         y: 0
-        width: 2461
-        height: 589
+        width: 9844
+        height: 2356
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}

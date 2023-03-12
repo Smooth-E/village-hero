@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _grounder: {fileID: 4032075017065169263}
+  _drawDebugRays: 0
 --- !u!1 &6798197647436579599
 GameObject:
   m_ObjectHideFlags: 0
