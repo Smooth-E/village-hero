@@ -3,7 +3,10 @@ using UnityEngine;
 public class EnemyTargetFinder : ITargetFinder
 {
 
-    public override Transform GetTargetTransform()
+    private Transform _lastTarget;
+    private bool _targetAvailable;
+
+    private void Update()
     {
         var origin = new Vector2(transform.position.x, transform.position.y);
         var direction = (PlayerInfo.Position - origin).normalized;
@@ -13,9 +16,15 @@ public class EnemyTargetFinder : ITargetFinder
         var hit = Physics2D.Raycast(transform.position, direction, distance, mask);
         Debug.DrawRay(origin, direction * distance, Color.magenta);
 
-        var targetAvailable = hit.collider != null && hit.collider.CompareTag("Player");
+        _targetAvailable = hit.collider != null && hit.collider.CompareTag("Player");
 
-        return targetAvailable ? hit.transform : null;
+        _lastTarget = _targetAvailable ? hit.transform : null;
     }
+
+    public override Transform GetTargetTransform() =>
+        _lastTarget;
+
+    public override bool ShouldShoot() =>
+        _targetAvailable;
 
 }

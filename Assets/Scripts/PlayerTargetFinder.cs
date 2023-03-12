@@ -21,4 +21,7 @@ public class PlayerTargetFinder : ITargetFinder
     public override Transform GetTargetTransform() =>
         _cursorTransform;
 
+    public override bool ShouldShoot() =>
+        Mouse.current.leftButton.isPressed;
+
 }
