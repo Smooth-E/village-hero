@@ -75,6 +75,7 @@ public static class PathFinder
             currentNode = currentNode.ParentNode;
         }
 
+        path.Add(startNode);
         path.Reverse();
         Debug.Log($"Final path length: {path.Count}");
         return path;

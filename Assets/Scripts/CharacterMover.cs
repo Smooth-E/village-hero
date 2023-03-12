@@ -20,7 +20,7 @@ public class CharacterMover : MonoBehaviour
     private void Update() =>
         _rigidbody.velocity = new Vector2(_horizontalVelocity * _moveSpeed, _rigidbody.velocity.y);
 
-    public void Jump(InputAction.CallbackContext context)
+    public void Jump()
     {
         if (_grounder.IsGrounded)
             _rigidbody.AddForce(new Vector2(0, _jumpForce), ForceMode2D.Impulse);

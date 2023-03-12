@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMover : MonoBehaviour
 {
@@ -9,10 +10,16 @@ public class PlayerMover : MonoBehaviour
     private void Start()
     {
         _actions = GameInput.GetPlayerActions();
-        _actions.Jump.performed += _mover.Jump;
+        _actions.Jump.performed += OnJumpEvent;
     }
 
     private void FixedUpdate() =>
         _mover.HorizontalVelocity = _actions.Walk.ReadValue<float>();
+    
+    private void OnDestroy() =>
+        _actions.Jump.performed -= OnJumpEvent;
+
+    private void OnJumpEvent(InputAction.CallbackContext context) =>
+        _mover.Jump();
 
 }

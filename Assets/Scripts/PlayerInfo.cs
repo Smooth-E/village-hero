@@ -24,16 +24,27 @@ public class PlayerInfo : MonoBehaviour
     private void OnGrounded(Platform platform) =>
         CurrentPlatform = platform;
 
+    private void OnDrawGizmos()
+    {
+        if (!Application.isPlaying)
+            return;
+        
+        Gizmos.color = Color.cyan;
+        foreach (var platform in ReachableFromPlatforms)
+            Gizmos.DrawSphere(platform.transform.position, 1f);
+    }
+
     private void GetReachablePlatforms()
     {
         ReachableFromPlatforms = new List<Platform>();
         
         for (var angle = 0; angle < 360; angle += 15)
         {
-            Debug.DrawRay(Position, Quaternion.Euler(0, 0, angle) * Vector2.up * 100f, Color.red);
-            var hit = Physics2D.Raycast(Position, Quaternion.Euler(0, 0, angle) * Vector2.up, 100f, LayerMask.GetMask(new string[]{ "Obstacles" }));
-            
-            // if (hit.collider != null) Debug.Log($"{hit.collider} {hit.collider.TryGetComponent<Platform>(out _)}");
+            var layerMask = LayerMask.GetMask(new string[]{ "Obstacles" });
+            var rayDirection = Quaternion.Euler(0, 0, angle) * Vector2.up;
+
+            Debug.DrawRay(Position, rayDirection * 100f, Color.red);
+            var hit = Physics2D.Raycast(Position, rayDirection, 100f, layerMask);
 
             Platform platform = null;
             var condition =
@@ -45,7 +56,6 @@ public class PlayerInfo : MonoBehaviour
                 ReachableFromPlatforms.Add(platform);
         }
 
-        // Debug.Log(ReachableFromPlatforms.Count);
     }
 
 }
