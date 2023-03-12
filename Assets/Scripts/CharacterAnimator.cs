@@ -25,6 +25,13 @@ public class CharacterAnimator : MonoBehaviour
         _animator.SetBool(_parameterRunning, _mover.HorizontalVelocity != 0);
         _animator.SetBool(_parameterGrounded, _grounder.IsGrounded);
         _animator.SetFloat(_parameterHorizontalVelocity, _mover.HorizontalVelocity);
+    
+        if (_mover.HorizontalVelocity == 0)
+            return;
+
+        var currentScale = transform.localScale;
+        currentScale.x = Mathf.Abs(currentScale.x) * -Mathf.Sign(_mover.HorizontalVelocity);
+        transform.localScale = currentScale;
     }
 
     private void OnDestroy() =>

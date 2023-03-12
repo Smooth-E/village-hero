@@ -7,8 +7,6 @@ using UnityEngine;
 public class Platform : MonoBehaviour
 {
 
-    [SerializeField] private Transform _bottomLeftCorner;
-    [SerializeField] private Transform _topRightCorner;
     [SerializeField] private List<PathFindingDestination> _possibleDestinations;
 
     public BoxCollider2D AreaCollider { private set; get; }

@@ -43,17 +43,19 @@ public class PlayerInfo : MonoBehaviour
             var layerMask = LayerMask.GetMask(new string[]{ "Platform", "Platform Area" });
             var rayDirection = Quaternion.Euler(0, 0, angle) * Vector2.up;
 
-            // Debug.DrawRay(Position, rayDirection * 100f, Color.red);
-            var hit = Physics2D.Raycast(Position, rayDirection, 100f, layerMask);
+            Debug.DrawRay(Position, rayDirection * 100f, Color.red);
+            var hits = Physics2D.RaycastAll(Position, rayDirection, 100f, layerMask);
 
-            Platform platform = null;
-            var condition =
-                hit.collider != null && 
-                hit.collider.TryGetComponent<Platform>(out platform) && 
-                !ReachableFromPlatforms.Contains(platform);
-            
-            if (condition)
-                ReachableFromPlatforms.Add(platform);
+            for (var index = 0; index < hits.Length; index++)
+            {
+                Platform platform = null;
+                
+                if (!hits[index].collider.TryGetComponent<Platform>(out platform))
+                    break;
+                
+                if (!ReachableFromPlatforms.Contains(platform))
+                    ReachableFromPlatforms.Add(platform);
+            }
         }
 
     }

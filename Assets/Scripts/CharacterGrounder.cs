@@ -5,7 +5,7 @@ public class CharacterGrounder : MonoBehaviour
 {
 
     [SerializeField] private Rigidbody2D _rigidbody;
-    [SerializeField] private float _circleRadius = 0.01f;
+    [SerializeField] private float _circleRadius = 0.2f;
 
     public bool IsGrounded { private set; get; }
 
@@ -14,8 +14,9 @@ public class CharacterGrounder : MonoBehaviour
     private void FixedUpdate()
     {
         var layerMask = LayerMask.GetMask(new string[]{ "Platform" });
-        var collider = Physics2D.OverlapCircle(transform.position, _circleRadius);
+        var collider = Physics2D.OverlapCircle(transform.position, _circleRadius, layerMask);
 
+        Debug.Log($"Collider: {collider == null}");
         var nowGrounded = collider != null;
 
         if (nowGrounded != IsGrounded && nowGrounded)
@@ -27,7 +28,7 @@ public class CharacterGrounder : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
-        Gizmos.DrawSphere(transform.position, _circleRadius);
+        Gizmos.DrawWireSphere(transform.position, _circleRadius);
     }
 
 }

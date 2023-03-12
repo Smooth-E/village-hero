@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rigidbody: {fileID: 0}
-  _circleRadius: 0.01
+  _circleRadius: 0.2
 --- !u!70 &2975146734368245731
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

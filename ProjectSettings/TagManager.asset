@@ -58,10 +58,10 @@ TagManager:
   - name: Villager
     uniqueID: 3029545399
     locked: 0
-  - name: New Layer 6
+  - name: Drops
     uniqueID: 1424278289
     locked: 0
-  - name: New Layer 7
+  - name: Landscape Particles
     uniqueID: 2716864407
     locked: 0
   - name: New Layer 8
