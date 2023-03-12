@@ -4,28 +4,30 @@ using UnityEngine;
 public class CharacterGrounder : MonoBehaviour
 {
 
-    private bool _isGrounded = false;
-
     [SerializeField] private Rigidbody2D _rigidbody;
+    [SerializeField] private float _circleRadius = 0.01f;
 
-    public bool IsGrounded => _isGrounded;
+    public bool IsGrounded { private set; get; }
 
     public event Action<Platform> OnGrounded;
 
-    private void OnCollisionEnter2D(Collision2D other)
+    private void FixedUpdate()
     {
-        if (other.gameObject.CompareTag("Ground"))
-        {
-            var platform = other.gameObject.GetComponentInChildren<Platform>();
-            OnGrounded?.Invoke(platform);
-            _isGrounded = true;
-        }
+        var layerMask = LayerMask.GetMask(new string[]{ "Platform" });
+        var collider = Physics2D.OverlapCircle(transform.position, _circleRadius);
+
+        var nowGrounded = collider != null;
+
+        if (nowGrounded != IsGrounded && nowGrounded)
+            OnGrounded?.Invoke(collider.GetComponentInChildren<Platform>());
+
+        IsGrounded = nowGrounded;
     }
 
-    private void OnCollisionExit2D(Collision2D other)
+    private void OnDrawGizmos()
     {
-        if (other.gameObject.CompareTag("Ground") || _rigidbody.velocity.y == 0)
-            _isGrounded = false;
+        Gizmos.color = Color.blue;
+        Gizmos.DrawSphere(transform.position, _circleRadius);
     }
 
 }

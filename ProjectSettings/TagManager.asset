@@ -49,14 +49,14 @@ TagManager:
   - name: Landscape
     uniqueID: 2919818217
     locked: 0
+  - name: Enemy
+    uniqueID: 295046175
+    locked: 0
   - name: Player
     uniqueID: 479896863
     locked: 0
-  - name: New Layer 4
+  - name: Villager
     uniqueID: 3029545399
-    locked: 0
-  - name: New Layer 5
-    uniqueID: 295046175
     locked: 0
   - name: New Layer 6
     uniqueID: 1424278289
