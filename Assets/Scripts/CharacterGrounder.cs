@@ -16,7 +16,7 @@ public class CharacterGrounder : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Ground"))
         {
-            var platform = other.gameObject.GetComponent<Platform>();
+            var platform = other.gameObject.GetComponentInChildren<Platform>();
             OnGrounded?.Invoke(platform);
             _isGrounded = true;
         }

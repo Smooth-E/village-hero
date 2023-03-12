@@ -1,6 +1,4 @@
-using System.Runtime.InteropServices;
 using System.Collections.Generic;
-using System.IO;
 using System.Collections;
 using UnityEngine;
 
@@ -68,7 +66,8 @@ public class EnemyPathRegulator : MonoBehaviour
         var direction = (PlayerInfo.Position - origin).normalized;
 
         var distance = Vector2.Distance(origin, PlayerInfo.Position);
-        var hit = Physics2D.Raycast(_originTransform.position, direction, distance);
+        var mask = LayerMask.GetMask(new string[]{ "Platform", "Player" });
+        var hit = Physics2D.Raycast(_originTransform.position, direction, distance, mask);
         Debug.DrawRay(origin, direction * distance, Color.magenta);
 
         var newTargetStatus =  hit.collider != null && hit.collider.CompareTag("Player");
@@ -81,6 +80,8 @@ public class EnemyPathRegulator : MonoBehaviour
 
     private void SelectClosestPlatformAndMoveToIt()
     {
+        Debug.Log("Selecting closest platform!");
+
         float closestDistance = -1;
         Platform closestPlatform = null;
 
@@ -132,14 +133,26 @@ public class EnemyPathRegulator : MonoBehaviour
             IEnumerator behaviour = null;
             switch (action)
             {
-                case PathFindingAction.FallFromEdge:
-                    behaviour = FallFromEdge();
+                case PathFindingAction.FallFromRightEdge:
+                    behaviour = FallFromEdge(_currentPlatform.RightEdge);
                     break;
-                case PathFindingAction.JumpAnywhere:
+                case PathFindingAction.FallFromLeftEdge:
+                    behaviour = FallFromEdge(_currentPlatform.LeftEdge);
+                    break;
+                case PathFindingAction.FallFromAnyEdge:
+                    behaviour = FallFromEdge(GetClosestEdge());
+                    break;
+                case PathFindingAction.JumpFromRightEdge:
+                    behaviour = JumpFromEdge(_currentPlatform.RightEdge);
+                    break;
+                case PathFindingAction.JumpFromLeftEdge:
+                    behaviour = JumpFromEdge(_currentPlatform.LeftEdge);
+                    break;
+                case PathFindingAction.JumpFromAnyEdge:
+                    behaviour = JumpFromEdge(GetClosestEdge());
+                    break;
+                case PathFindingAction.JumpAnywhereUnder:
                     behaviour = JumpAnywhere(nextPlatform);
-                    break;
-                case PathFindingAction.JumpFromEdge:
-                    behaviour = JumpFromEdge(nextPlatform);
                     break;
             }
             Debug.Log($"Selected action: {action}");
@@ -153,28 +166,31 @@ public class EnemyPathRegulator : MonoBehaviour
         }
     }
 
-    private IEnumerator JumpFromEdge(Platform destination)
+    private float GetClosestEdge()
+    {
+        var currentX = transform.position.x;
+        if (Mathf.Abs(currentX - _currentPlatform.LeftEdge) > Mathf.Abs(currentX - _currentPlatform.RightEdge))
+            return _currentPlatform.RightEdge;
+        else
+            return _currentPlatform.LeftEdge;
+    }
+
+    private IEnumerator MoveToThePointX(float destinationX)
+    {
+        var direction = Mathf.Sign(destinationX - transform.position.x);
+        _mover.HorizontalVelocity = direction;
+        yield return new WaitUntil(() => (transform.position.x - destinationX) * direction > 0);
+    }
+
+    private IEnumerator JumpFromEdge(float edge)
     {
         Debug.Log("Jumping from edge!");
-        
-        float edge = 0;
-        float direction = 0;
-        if (_currentPlatform.transform.position.x < destination.transform.position.x)
-        {
-            edge = _currentPlatform.RightEdge;
-            direction = 1;
-        }
-        else
-        {
-            edge = _currentPlatform.LeftEdge;
-            direction = -1;
-        }
 
-        _mover.HorizontalVelocity = direction;
-        yield return new WaitUntil(() => (transform.position.x - edge) * direction > 0);
+        var enumerator = MoveToThePointX(edge);
+        while (enumerator.MoveNext())
+            yield return enumerator.Current;
 
         var oldPlatform = _currentPlatform;
-        Debug.Log("Jumping!");
         _mover.Jump();
         yield return new WaitUntil(() => _currentPlatform != oldPlatform);
 
@@ -194,6 +210,7 @@ public class EnemyPathRegulator : MonoBehaviour
         );
 
         _mover.Jump();
+        _mover.HorizontalVelocity = direction * 0.5f;
         var oldPlatform = _currentPlatform;
         yield return new WaitUntil(() => _currentPlatform != oldPlatform);
 
@@ -201,26 +218,13 @@ public class EnemyPathRegulator : MonoBehaviour
         _mover.HorizontalVelocity = 0;
     }
 
-    private IEnumerator FallFromEdge()
+    private IEnumerator FallFromEdge(float edge)
     {
         Debug.Log("Falling from edge!");
 
-        float closestEdge = 0;
-        float direction = 0;
-
-        if (transform.position.x - _currentPlatform.LeftEdge < _currentPlatform.RightEdge - transform.position.x)
-        {
-            closestEdge = _currentPlatform.LeftEdge;
-            direction = -1;
-        }
-        else
-        {
-            closestEdge = _currentPlatform.RightEdge;
-            direction = 1;
-        }
-
-        _mover.HorizontalVelocity = direction;
-        yield return new WaitUntil(() => (transform.position.x - closestEdge) * direction > 0);
+        var enumerator = MoveToThePointX(edge);
+        while (enumerator.MoveNext())
+            yield return enumerator.Current;
 
         var oldPlatform = _currentPlatform;
         yield return new WaitUntil(() => _currentPlatform != oldPlatform);

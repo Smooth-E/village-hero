@@ -1,6 +1,10 @@
 public enum PathFindingAction
 {
-    FallFromEdge,
-    JumpAnywhere,
-    JumpFromEdge
+    FallFromRightEdge,
+    FallFromLeftEdge,
+    FallFromAnyEdge,
+    JumpFromRightEdge,
+    JumpFromLeftEdge,
+    JumpFromAnyEdge,
+    JumpAnywhereUnder,
 }

@@ -40,10 +40,10 @@ public class PlayerInfo : MonoBehaviour
         
         for (var angle = 0; angle < 360; angle += 15)
         {
-            var layerMask = LayerMask.GetMask(new string[]{ "Obstacles" });
+            var layerMask = LayerMask.GetMask(new string[]{ "Platform", "Platform Area" });
             var rayDirection = Quaternion.Euler(0, 0, angle) * Vector2.up;
 
-            Debug.DrawRay(Position, rayDirection * 100f, Color.red);
+            // Debug.DrawRay(Position, rayDirection * 100f, Color.red);
             var hit = Physics2D.Raycast(Position, rayDirection, 100f, layerMask);
 
             Platform platform = null;
