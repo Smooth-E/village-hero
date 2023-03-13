@@ -11,9 +11,16 @@ public class Cutscene2 : MonoBehaviour
     [SerializeField] private EnemySpawner _spawner;
     [SerializeField] private Button _endButton;
 
+    private void Start() =>
+        StartCoroutine(CutsceneCoroutine());
+
     private IEnumerator CutsceneCoroutine()
     {
-        yield return new WaitUntil(() => _spawner.EnemiesAlive == 0 && _spawner.EnemiesLeftToSpawn == 0);
+        yield return new WaitUntil(() => 
+        {
+            Debug.Log(_spawner.EnemiesAlive + " " + _spawner.EnemiesLeftToSpawn);
+            return _spawner.EnemiesAlive == 0 && _spawner.EnemiesLeftToSpawn == 0;
+        });
 
         _boxOfText.SetActive(true);
         _fancyText.ChangeText( 

@@ -18,7 +18,7 @@ public class CharacterHealth : MonoBehaviour
     public event Action<int> OnHealthIncreased;
     public event Action OnDeath;
 
-    private void Awake()
+    private void Start()
     {
         _health = _maxHealth;
         OnHealthIncreased?.Invoke(_health);

@@ -34,7 +34,8 @@ public class PlayerInfo : MonoBehaviour
         
         Gizmos.color = Color.cyan;
         foreach (var platform in ReachableFromPlatformAreas)
-            Gizmos.DrawSphere(platform.transform.position, 0.3f);
+            if (platform != null)
+                Gizmos.DrawSphere(platform.transform.position, 0.3f);
     }
 
     private void GetReachablePlatforms()
