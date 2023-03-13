@@ -71,6 +71,7 @@ GameObject:
   - component: {fileID: 3772869034205830301}
   - component: {fileID: 3772869034205830302}
   - component: {fileID: 3772869034205830303}
+  - component: {fileID: 8704849820891419207}
   m_Layer: 10
   m_Name: "\u041F\u043B\u0430\u0442\u0444\u043E\u0440\u043C\u0430 2"
   m_TagString: Obstacle
@@ -192,6 +193,27 @@ PlatformEffector2D:
   m_UseSideFriction: 0
   m_UseSideBounce: 0
   m_SideArc: 1
+--- !u!95 &8704849820891419207
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3772869034205830304}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: ffc03c1ef87c3844b962323c30df582e, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &3772869035120607926
 GameObject:
   m_ObjectHideFlags: 0

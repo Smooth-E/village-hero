@@ -9,6 +9,7 @@ TagManager:
   - Obstacle
   - Player's Bullet
   - Enemy's Bullet
+  - Heal
   layers:
   - Default
   - TransparentFX
@@ -21,7 +22,7 @@ TagManager:
   - Player
   - Enemy
   - Obstacle
-  - 
+  - Feet
   - 
   - 
   - 

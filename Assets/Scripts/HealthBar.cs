@@ -23,7 +23,7 @@ public class HealthBar : MonoBehaviour
     private void UpdateHealthBar(int newHealth)
     {
         for (int index = 1; index <= _playerHealth.MaxHealth; index++)
-            _hearts[index].SetBool(_parameter, index <= newHealth);
+            _hearts[index - 1].SetBool(_parameter, index <= newHealth);
     }
 
 }

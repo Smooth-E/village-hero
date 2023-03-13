@@ -859,7 +859,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectile: {fileID: 8353162492857163718, guid: bc95447d9556a4d0381c03652c6db0fa, type: 3}
   _gunTip: {fileID: 8779538662104824607}
-  _shootingInterval: 0.3
+  _shootingInterval: 2
   _projectileVelocity: 2
   _targetFinder: {fileID: 8122609933420849717}
   _shoulderTransform: {fileID: 3353181886449856621}
@@ -879,7 +879,7 @@ MonoBehaviour:
   _maxHealth: 5
   _canHeal: 0
   _healTag: Heal
-  _badProjectile: Player's Projectile
+  _badProjectile: Player's Bullet
 --- !u!1 &4892419601738379315
 GameObject:
   m_ObjectHideFlags: 0

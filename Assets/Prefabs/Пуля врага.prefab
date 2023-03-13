@@ -96,6 +96,7 @@ GameObject:
   - component: {fileID: 5624321270370573389}
   - component: {fileID: 8844063756385357565}
   - component: {fileID: 8735907291393205524}
+  - component: {fileID: 601998742444926202}
   m_Layer: 0
   m_Name: "\u041F\u0443\u043B\u044F \u0432\u0440\u0430\u0433\u0430"
   m_TagString: Enemy's Bullet
@@ -178,3 +179,15 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.91, y: 0.4}
   m_EdgeRadius: 0
+--- !u!114 &601998742444926202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8353162492857163718}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2be38ec9d3bff564a3bda658e2376ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
