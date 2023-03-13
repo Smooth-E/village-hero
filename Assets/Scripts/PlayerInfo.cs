@@ -17,6 +17,7 @@ public class PlayerInfo : MonoBehaviour
     private void Update()
     {
         Position = transform.position;
+        // Debug.Log($"Player position: {Position}, {gameObject.name}");
         GetReachablePlatforms();
     }
     

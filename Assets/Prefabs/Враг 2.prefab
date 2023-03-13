@@ -382,9 +382,11 @@ GameObject:
   - component: {fileID: 5554489783350899008}
   - component: {fileID: 6674453945703029546}
   - component: {fileID: 1027113576634676991}
-  m_Layer: 0
+  - component: {fileID: 5451246522594921165}
+  - component: {fileID: 7951117022442241543}
+  m_Layer: 9
   m_Name: "\u0412\u0440\u0430\u0433 2"
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -540,6 +542,34 @@ MonoBehaviour:
   _canHeal: 0
   _healTag: Heal
   _badProjectile: Player's Bullet
+--- !u!70 &5451246522594921165
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7806145813187372494}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0.79653907}
+  m_Size: {x: 6.89, y: 16.399534}
+  m_Direction: 0
+--- !u!114 &7951117022442241543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7806145813187372494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bf963b6fab753aa0a80398a038c3282, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7806145813725191568
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,6 +10,8 @@ TagManager:
   - Player's Bullet
   - Enemy's Bullet
   - Heal
+  - Enemy
+  - Death Zone
   layers:
   - Default
   - TransparentFX

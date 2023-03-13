@@ -38,7 +38,7 @@ public static class PathFinder
                 return CreateFinalPath(startNode, destinationNode);
 
             var neighboringNodes = currentNode.GetNeighboringNodes();
-            Debug.Log($"Found neighboring nodes: {neighboringNodes.Count}");
+            // Debug.Log($"Found neighboring nodes: {neighboringNodes.Count}");
 
             foreach (var neighboringNode in neighboringNodes)
             {

@@ -63,7 +63,7 @@ public class EnemyPathRegulator : MonoBehaviour
     private IEnumerator TargetCheckCoroutine()
     {
         yield return new WaitUntil(() => _currentPlatformArea != null);
-        Debug.Log("Started patrolling!");
+        // Debug.Log("Started patrolling!");
 
         while (true)
         {
@@ -84,7 +84,7 @@ public class EnemyPathRegulator : MonoBehaviour
 
     private void SelectClosestPlatformAndMoveToIt()
     {
-        Debug.Log("Selecting closest platform!");
+        // Debug.Log("Selecting closest platform!");
 
         float closestDistance = -1;
         PlatformArea closestPlatformArea = null;
@@ -163,7 +163,7 @@ public class EnemyPathRegulator : MonoBehaviour
                     behaviour = JumpAnywhere(nextPlatform);
                     break;
             }
-            Debug.Log($"Selected action: {action}");
+            // Debug.Log($"Selected action: {action}");
 
             _tempHighlightPlatformArea = nextPlatform;
 
@@ -194,7 +194,7 @@ public class EnemyPathRegulator : MonoBehaviour
 
     private IEnumerator JumpFromEdge(float edge)
     {
-        Debug.Log("Jumping from edge!");
+        // Debug.Log("Jumping from edge!");
 
         var enumerator = MoveToThePointX(edge);
         while (enumerator.MoveNext())
@@ -209,7 +209,7 @@ public class EnemyPathRegulator : MonoBehaviour
 
     private IEnumerator JumpAnywhere(PlatformArea destination)
     {
-        Debug.Log("Jumping anywhere!");
+        // Debug.Log("Jumping anywhere!");
         
         var direction = transform.position.x > destination.transform.position.x ? -1 : 1;
         _mover.HorizontalVelocity = direction;
@@ -229,7 +229,7 @@ public class EnemyPathRegulator : MonoBehaviour
 
     private IEnumerator FallFromEdge(float edge)
     {
-        Debug.Log("Falling from edge!");
+        // Debug.Log("Falling from edge!");
 
         var enumerator = MoveToThePointX(edge);
         while (enumerator.MoveNext())

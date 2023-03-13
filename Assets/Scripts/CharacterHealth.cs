@@ -32,7 +32,10 @@ public class CharacterHealth : MonoBehaviour
             OnHealthDecreased?.Invoke(_health);
 
             if (_health <= 0)
+            {
+                Destroy(gameObject);
                 OnDeath?.Invoke();
+            }
         }
         else if (_canHeal && other.gameObject.CompareTag("Heal"))
         {
@@ -40,6 +43,14 @@ public class CharacterHealth : MonoBehaviour
             _health = Mathf.Min(_maxHealth, _health);
             OnHealthIncreased?.Invoke(_health);
         }
+    }
+
+    public void Kill()
+    {
+        _health = 0;
+        OnHealthDecreased?.Invoke(_health);
+        Destroy(gameObject);
+        OnDeath?.Invoke();
     }
 
 }

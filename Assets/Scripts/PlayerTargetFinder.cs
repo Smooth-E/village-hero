@@ -15,7 +15,6 @@ public class PlayerTargetFinder : ITargetFinder
     {
         var mousePosition = Mouse.current.position.ReadValue();
         _cursorTransform.position = _camera.ScreenToWorldPoint(new Vector3(mousePosition.x, mousePosition.y, 10));
-        Debug.Log(mousePosition);
     }
 
     public override Transform GetTargetTransform() =>
