@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerTargetFinder : ITargetFinder
+public class PlayerTargetFinder : AbstractTargetFinder
 {
 
     private Camera _camera;

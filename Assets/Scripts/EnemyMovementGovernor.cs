@@ -2,24 +2,32 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 
-public class EnemyPathRegulator : MonoBehaviour
+/// <summary>
+/// Controls the movement of an enemy based on whether it has a target and whether it is reachable
+/// </summary>
+public class EnemyMovementGovernor : MonoBehaviour
 {
 
+    /// <summary>
+    /// An action type tells the reason why the enemy is currently moving
+    /// </summary>
     private enum ActionType
     {
+        /// <summary>The purpose of enemy's movement is currently unknown or not set, yet</summary>
         None,
+        /// <summary>The enemy have successfully found a target and is now moving to it</summary>
         Traveling,
-        HangingOut
+        /// <summary>The target is unreachable and the enemy is roaming around</summary>
+        Roaming
     }
-
-    private const float PlayerHeight = 1;
+    
     private const float TargetCheckInterval = 0.01f;
     
-    private Coroutine _currentActionCoroutine = null;
-    private PlatformArea _currentPlatformArea = null;
+    private Coroutine _currentActionCoroutine;
+    private PlatformArea _currentPlatformArea;
 
-    private PlatformArea _tempHighlightPlatformArea = null;
-    private List<PathFindingNode> _tempLastPath = null;
+    private PlatformArea _tempHighlightPlatformArea;
+    private List<PathFindingNode> _tempLastPath;
     private ActionType _currentActionType = ActionType.None; 
 
     [SerializeField] private Transform _originTransform;
@@ -49,7 +57,9 @@ public class EnemyPathRegulator : MonoBehaviour
         Gizmos.color = Color.green;
         for (int i = 0; i < _tempLastPath.Count - 1; i++)
         {
-            Gizmos.DrawLine(_tempLastPath[i].LinkedPlatformArea.transform.position, _tempLastPath[i + 1].LinkedPlatformArea.transform.position);
+            var startingPoint = _tempLastPath[i].LinkedPlatformArea.transform.position;
+            var endPoint = _tempLastPath[i + 1].LinkedPlatformArea.transform.position;
+            Gizmos.DrawLine(startingPoint, endPoint);
             Gizmos.DrawWireSphere(_tempLastPath[i + 1].LinkedPlatformArea.transform.position, 1.2f);
         }
 
@@ -63,7 +73,6 @@ public class EnemyPathRegulator : MonoBehaviour
     private IEnumerator TargetCheckCoroutine()
     {
         yield return new WaitUntil(() => _currentPlatformArea != null);
-        // Debug.Log("Started patrolling!");
 
         while (true)
         {
@@ -84,14 +93,13 @@ public class EnemyPathRegulator : MonoBehaviour
 
     private void SelectClosestPlatformAndMoveToIt()
     {
-        // Debug.Log("Selecting closest platform!");
-
         float closestDistance = -1;
         PlatformArea closestPlatformArea = null;
 
         foreach (var platform in PlayerInfo.ReachableFromPlatformAreas)
         {
-            var currentDistance = Vector2.Distance(_originTransform.position, platform.transform.position);
+            var currentDistance = 
+                Vector2.Distance(_originTransform.position, platform.transform.position);
 
             if (platform != _currentPlatformArea && (closestDistance == -1 || closestDistance > currentDistance))
             {
@@ -101,7 +109,7 @@ public class EnemyPathRegulator : MonoBehaviour
         }
 
 
-        if (closestDistance == -1 && _currentActionType != ActionType.HangingOut)
+        if (closestDistance == -1 && _currentActionType != ActionType.Roaming)
             _currentActionCoroutine = StartCoroutine(HangAroundCoroutine());
         else if (closestDistance != -1)
             _currentActionCoroutine = StartCoroutine(MoveToPlatformCoroutine(closestPlatformArea));
@@ -244,7 +252,7 @@ public class EnemyPathRegulator : MonoBehaviour
     private IEnumerator HangAroundCoroutine()
     {
         StopCurrentAction();
-        _currentActionType = ActionType.HangingOut;
+        _currentActionType = ActionType.Roaming;
         _tempLastPath = null;
 
         var direction = Random.Range(0, 2) == 0 ? 0.5f : -0.5f;

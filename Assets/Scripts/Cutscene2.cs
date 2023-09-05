@@ -9,7 +9,6 @@ public class Cutscene2 : MonoBehaviour
     [SerializeField] private FancyText _fancyText;
     [SerializeField] private GameObject _boxOfText;
     [SerializeField] private EnemySpawner _spawner;
-    [SerializeField] private Button _endButton;
 
     private void Start() =>
         StartCoroutine(CutsceneCoroutine());

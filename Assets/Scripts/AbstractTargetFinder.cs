@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class ITargetFinder : MonoBehaviour
+public abstract class AbstractTargetFinder : MonoBehaviour
 {
     public abstract Transform GetTargetTransform();
 

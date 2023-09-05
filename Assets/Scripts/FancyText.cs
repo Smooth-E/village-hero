@@ -1,101 +1,115 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 
 [RequireComponent(typeof(Text))]
 public class FancyText : MonoBehaviour, IPointerDownHandler
 {
 
-    Text textComponent;
-    public string textString;
-    bool spellingCoroutineInProgress = false;
-    [HideInInspector] public bool textSpelled = false;
-    [HideInInspector] public bool spellImidiately = false;
-    const string spellingCoroutineName = "spellingCoroutine";
-    const string setNiceTextSizeCoroutineName = "setNiceTextSizeCoroutine";
-    public float spellingDelay = .01f;
-    bool textSizeSet = false;
-    bool isActive;
-    bool retype = false;
+    [FormerlySerializedAs("textString")] public string TextString;
+    public float SpellingDelay = 0.03333334f;
+    
+    [HideInInspector] public bool TextSpelled;
+    [HideInInspector] public bool SpellImmediately;
 
-    void Start()
+    private RectTransform _rectTransform;
+    private bool _spellingCoroutineInProgress = false;
+    private Text _textComponent;
+    private bool _textSizeSet;
+    private bool _isActive;
+    private bool _retype;
+
+    private void Start()
     {
-        textComponent = GetComponent<Text>();
-        textString = textComponent.text;
-        StartCoroutine(setNiceTextSizeCoroutineName);
+        _rectTransform = GetComponent<RectTransform>();
+        _textComponent = GetComponent<Text>();
+        TextString = _textComponent.text;
+        StartCoroutine(SetNiceTextSizeCoroutine());
     }
 
-    IEnumerator setNiceTextSizeCoroutine()
+    private IEnumerator SetNiceTextSizeCoroutine()
     {
         yield return null;
-        int ceachedSize = (int)(textComponent.cachedTextGenerator.fontSizeUsedForBestFit / textComponent.canvas.scaleFactor);
-        textComponent.resizeTextForBestFit = false;
-        textComponent.fontSize = ceachedSize;
-        textSizeSet = true;
+        
+        var bestFitSize = _textComponent.cachedTextGenerator.fontSizeUsedForBestFit;
+        var scaleFactor = _textComponent.canvas.scaleFactor;
+        var cachedSize = (int)(bestFitSize / scaleFactor);
+        
+        _textComponent.resizeTextForBestFit = false;
+        _textComponent.fontSize = cachedSize;
+        _textSizeSet = true;
     }
 
-    IEnumerator spellingCoroutine()
+    IEnumerator SpellingCoroutine()
     {
-        retype = false;
-        spellingCoroutineInProgress = true;
-        textComponent.text = "";
-        bool finishedByRetype = false;
-        foreach(char symbol in textString)
+        _retype = false;
+        _spellingCoroutineInProgress = true;
+        _textComponent.text = "";
+        var finishedByRetype = false;
+        
+        foreach(char symbol in TextString)
         {
-            if (retype)
+            if (_retype)
             {
                 finishedByRetype = true;
-                StartCoroutine(spellingCoroutine());
+                StartCoroutine(SpellingCoroutine());
                 break;
             }
-            textComponent.text += symbol;
-            if (spellImidiately)
+            
+            _textComponent.text += symbol;
+            if (SpellImmediately)
             {
-                textComponent.text = textString;
+                _textComponent.text = TextString;
                 break;
             }
-            if (!isActive) break;
-            yield return new WaitForSeconds(spellingDelay);
+            
+            if (!_isActive) 
+                break;
+            
+            yield return new WaitForSeconds(SpellingDelay);
         }
         if (!finishedByRetype)
         {
-            textSpelled = true;
-            spellingCoroutineInProgress = false;
+            TextSpelled = true;
+            _spellingCoroutineInProgress = false;
         }
     }
 
     void Update()
     {
-        if (textSizeSet)
+        if (_textSizeSet)
         {
-            isActive = GetComponent<RectTransform>().lossyScale.x > 0 && GetComponent<RectTransform>().lossyScale.y > 0;
-            if (isActive && !spellingCoroutineInProgress && !textSpelled) StartCoroutine(spellingCoroutineName);
-            else if (!isActive)
+            _isActive = _rectTransform.lossyScale.x > 0 && _rectTransform.lossyScale.y > 0;
+            
+            if (_isActive && !_spellingCoroutineInProgress && !TextSpelled)
             {
-                textComponent.text = "";
-                textSpelled = false;
+                StartCoroutine(SpellingCoroutine());
+            }
+            else if (!_isActive)
+            {
+                _textComponent.text = "";
+                TextSpelled = false;
             }
         }
     }
 
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        spellImidiately = true;
-    }
+    public void OnPointerDown(PointerEventData eventData) =>
+        SpellImmediately = true;
 
-    IEnumerator changeTextCoruotine(string newText)
+    IEnumerator ChangeTextCoruotine(string newText)
     {
         yield return null;
-        textString = newText;
-        GetComponent<RectTransform>().localScale = Vector2.zero;
+        
+        TextString = newText;
+        _rectTransform.localScale = Vector2.zero;
         yield return null;
-        GetComponent<RectTransform>().localScale = Vector2.one;
+        
+        _rectTransform.localScale = Vector2.one;
     }
 
-    public void ChangeText(string newText)
-    {
-        StartCoroutine(changeTextCoruotine(newText));
-    }
+    public void ChangeText(string newText) =>
+        StartCoroutine(ChangeTextCoruotine(newText));
+
 }

@@ -4,6 +4,12 @@ using System.Collections.Generic;
 public static class PathFinder
 {
     
+    /// <summary>
+    /// Finds the shortest path between two platforms and returns a list of nodes to follow.
+    /// </summary>
+    /// <param name="start">The starting platform area</param>
+    /// <param name="destination">The destination platform area</param>
+    /// <returns>An ordered list of path finding nodes to follow</returns>
     public static List<PathFindingNode> FindPath(PlatformArea start, PlatformArea destination)
     {
         PathFindingGraph.Initialize();

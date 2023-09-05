@@ -41,7 +41,7 @@ public class PlatformArea : MonoBehaviour
         }
 
         if (!platformFound)
-            Debug.LogError("GetActionForDestination: Платформа не найдена!");
+            Debug.LogError("GetActionForDestination: Platform not found!");
 
         return action;
     }

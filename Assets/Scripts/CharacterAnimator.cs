@@ -13,7 +13,7 @@ public class CharacterAnimator : MonoBehaviour
     
     [SerializeField] private CharacterMover _mover;
     [SerializeField] private CharacterGrounder _grounder;
-    [SerializeField] private ITargetFinder _targetFinder;
+    [SerializeField] private AbstractTargetFinder _targetFinder;
 
     private void Start()
     {

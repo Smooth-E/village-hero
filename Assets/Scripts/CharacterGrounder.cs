@@ -3,8 +3,7 @@ using UnityEngine;
 
 public class CharacterGrounder : MonoBehaviour
 {
-
-    [SerializeField] private Rigidbody2D _rigidbody;
+    
     [SerializeField] private float _circleRadius = 0.2f;
 
     public bool IsGrounded { private set; get; }

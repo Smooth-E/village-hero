@@ -8,9 +8,8 @@ public class Shooter : MonoBehaviour
     [SerializeField] private Transform _gunTip;
     [SerializeField] private float _shootingInterval;
     [SerializeField] private float _projectileVelocity;
-    [SerializeField] private ITargetFinder _targetFinder;
+    [SerializeField] private AbstractTargetFinder _targetFinder;
     [SerializeField] private Transform _shoulderTransform;
-    [SerializeField] private GunRotator _gunRotator;
 
     private void Start() =>
         StartCoroutine(ShootingCoroutine());
@@ -25,7 +24,7 @@ public class Shooter : MonoBehaviour
             var projectile = Instantiate(_projectile);
             projectile.transform.position = _gunTip.transform.position;
             projectile.transform.rotation = _shoulderTransform.transform.rotation;
-            projectile.GetComponent<Rigidbody2D>().velocity = _projectileVelocity * direction.normalized * 10;
+            projectile.GetComponent<Rigidbody2D>().velocity = direction.normalized * (_projectileVelocity * 10);
 
             yield return new WaitForSeconds(_shootingInterval);
         }

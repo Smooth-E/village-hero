@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EnemyTargetFinder : ITargetFinder
+public class EnemyTargetFinder : AbstractTargetFinder
 {
 
     private Transform _lastTarget;
@@ -12,7 +12,7 @@ public class EnemyTargetFinder : ITargetFinder
         var direction = (PlayerInfo.Position - origin).normalized;
 
         var distance = Vector2.Distance(origin, PlayerInfo.Position);
-        var mask = LayerMask.GetMask(new string[]{ "Obstacle", "Player" });
+        var mask = LayerMask.GetMask("Obstacle", "Player");
         var hit = Physics2D.Raycast(transform.position, direction, distance, mask);
         Debug.DrawRay(origin, direction * distance, Color.magenta);
 

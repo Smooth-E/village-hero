@@ -8,8 +8,7 @@ public class CharacterHealth : MonoBehaviour
     private int _health;
 
     [SerializeField] private int _maxHealth = 5;
-    [SerializeField] private bool _canHeal = false;
-    [SerializeField] private string _healTag = "Heal";
+    [SerializeField] private bool _canHeal;
     [SerializeField] private string _badProjectile;
 
     public int MaxHealth => _maxHealth;

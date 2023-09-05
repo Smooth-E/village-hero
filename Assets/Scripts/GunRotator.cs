@@ -4,7 +4,7 @@ public class GunRotator : MonoBehaviour
 {
 
     [SerializeField] private Vector2 _defaultPosition = Vector2.left;
-    [SerializeField] private ITargetFinder _targetFinder;
+    [SerializeField] private AbstractTargetFinder _targetFinder;
 
     public float CurrentRotation => transform.eulerAngles.z;
     public Vector2 DefaultPosition => _defaultPosition;

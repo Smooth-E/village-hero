@@ -14,7 +14,6 @@ public class Cutscene1 : MonoBehaviour
     [SerializeField] private Animator _mainPlatformAnimator;
     [SerializeField] private Animator[] _otherPlatforms;
     [SerializeField] private GameObject _boxOfText;
-    [SerializeField] private FancyText _fancyText;
 
     private void Start() =>
         StartCoroutine(CutsceneCoroutine());

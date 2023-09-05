@@ -20,7 +20,6 @@ public class GameInput : MonoBehaviour
 
         _instance = this;
 
-
         _playerControls = new PlayerControls();
         _playerControls.Player.Enable();
     }

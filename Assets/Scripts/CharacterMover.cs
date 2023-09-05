@@ -7,7 +7,7 @@ public class CharacterMover : MonoBehaviour
     private readonly float _jumpForce = 30f;
     private readonly float _moveSpeed = 10f;
 
-    private float _horizontalVelocity = 0;
+    private float _horizontalVelocity;
 
     [SerializeField] private Rigidbody2D _rigidbody;
     [SerializeField] private CharacterGrounder _grounder;
