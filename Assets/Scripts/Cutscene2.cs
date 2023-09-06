@@ -1,8 +1,8 @@
 using UnityEngine;
 using System.Collections;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+/// <summary>A cutscene behaviour that plays after all of the enemies are beaten.</summary>
 public class Cutscene2 : MonoBehaviour
 {
 

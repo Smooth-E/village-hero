@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>A custscene behaviour for an ending scene.</summary>
 public class CutsceneEnd : MonoBehaviour
 {
 
@@ -31,9 +32,7 @@ public class CutsceneEnd : MonoBehaviour
         _boxAlive.SetActive(!Cat.WasHurt);
     }
 
-    public void End()
-    {
+    public void End() =>
         SceneManager.LoadScene(0);
-    }
 
 }

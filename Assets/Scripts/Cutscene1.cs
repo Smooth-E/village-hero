@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>A cutscene behaviour that plays when the game starts.</summary>
 public class Cutscene1 : MonoBehaviour
 {
 
@@ -29,7 +30,7 @@ public class Cutscene1 : MonoBehaviour
         while (_playerMover.transform.position.x< _points[0].position.x)
             yield return null;
 
-        Debug.Log("Jump~ " + PlayerInfo.Position);
+        Debug.Log("Jump " + PlayerInfo.Position);
         _mover.Jump();
         yield return new WaitUntil(() => _playerMover.transform.position.x >= _points[1].position.x);
 

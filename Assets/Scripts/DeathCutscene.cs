@@ -1,14 +1,13 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+/// <summary>A cutscene behaviour that plays when the player dies.</summary>
 public class DeathCutscene : MonoBehaviour
 {
 
     [SerializeField] private CharacterHealth _playerHealth;
     [SerializeField] private GameObject _textBox;
     [SerializeField] private FancyText _text;
-    [SerializeField] private Button _button;
 
     private void Start() =>
         _playerHealth.OnDeath += OnDeath;
