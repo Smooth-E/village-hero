@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class PathFinder : MonoBehaviour
 {
 
-    public Dictionary<PlatformArea, PathFindingNode> Graph { private set; get; }
+    public Dictionary<Platform, PathFindingNode> Graph { private set; get; }
 
     /// <summary>
     /// Finds the shortest path between two platforms and returns a list of nodes to follow.
@@ -12,7 +12,7 @@ public class PathFinder : MonoBehaviour
     /// <param name="start">The starting platform area</param>
     /// <param name="destination">The destination platform area</param>
     /// <returns>An ordered list of path finding nodes to follow</returns>
-    public List<PathFindingNode> FindPath(PlatformArea start, PlatformArea destination)
+    public List<PathFindingNode> FindPath(Platform start, Platform destination)
     {
         InitializeGraph();
 
@@ -91,9 +91,9 @@ public class PathFinder : MonoBehaviour
 
     private void InitializeGraph()
     {
-        Graph = new Dictionary<PlatformArea, PathFindingNode>();
+        Graph = new Dictionary<Platform, PathFindingNode>();
 
-        foreach (var platform in FindObjectsOfType<PlatformArea>())
+        foreach (var platform in FindObjectsOfType<Platform>())
             Graph.Add(platform, new PathFindingNode(platform, this));
     }
 

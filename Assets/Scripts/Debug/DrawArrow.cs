@@ -29,6 +29,9 @@ public static class DrawArrow
         var direction = (to - from).normalized;
         var baseCenterPoint = to - direction * headRadius;
         
+        if (direction == Vector3.zero)
+            return;
+        
         var radiusVector = Quaternion.LookRotation(direction) * Vector3.up * headRadius / headRadiusToLengthRatio;
         var points = new List<Vector3>();
         for (int i = 0; i < pointsOnCircle; i++)

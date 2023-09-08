@@ -8,7 +8,7 @@ public class CharacterGrounder : MonoBehaviour
 
     public bool IsGrounded { private set; get; }
 
-    public event Action<PlatformArea> OnGrounded;
+    public event Action<Platform> OnGrounded;
 
     private void FixedUpdate()
     {
@@ -18,7 +18,7 @@ public class CharacterGrounder : MonoBehaviour
         var nowGrounded = collider != null;
 
         if (nowGrounded != IsGrounded && nowGrounded)
-            OnGrounded?.Invoke(collider.transform.parent.GetComponentInChildren<PlatformArea>());
+            OnGrounded?.Invoke(collider.transform.parent.GetComponentInChildren<Platform>());
 
         IsGrounded = nowGrounded;
     }

@@ -1,16 +1,17 @@
 using System;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class PathFindingDestination
 {
-    public PlatformArea DestinationPlatformArea;
+    [FormerlySerializedAs("DestinationPlatformArea")] public Platform DestinationPlatform;
     public PathFindingAction Action;
 
     public PathFindingDestination() { }
 
-    public PathFindingDestination(PlatformArea platformArea, PathFindingAction action)
+    public PathFindingDestination(Platform platform, PathFindingAction action)
     {
-        DestinationPlatformArea = platformArea;
+        DestinationPlatform = platform;
         Action = action;
     }
     

@@ -4,9 +4,9 @@ using UnityEngine;
 public class PlayerInfo : MonoBehaviour
 {
 
-    public static PlatformArea CurrentPlatform { private set; get; }
+    public static Platform CurrentPlatform { private set; get; }
     public static Vector2 Position { private set; get; }
-    public static List<PlatformArea> ReachableFromPlatformAreas { private set; get; } = new List<PlatformArea>();
+    public static List<Platform> ReachableFromPlatformAreas { private set; get; } = new List<Platform>();
 
     [SerializeField] private CharacterGrounder _grounder;
     [SerializeField] private bool _drawDebugRays = true;
@@ -24,8 +24,8 @@ public class PlayerInfo : MonoBehaviour
     private void OnDestroy() =>
         _grounder.OnGrounded -= OnGrounded;
 
-    private void OnGrounded(PlatformArea platformArea) =>
-        CurrentPlatform = platformArea;
+    private void OnGrounded(Platform platform) =>
+        CurrentPlatform = platform;
 
     private void OnDrawGizmos()
     {
@@ -40,7 +40,7 @@ public class PlayerInfo : MonoBehaviour
 
     private void GetReachablePlatforms()
     {
-        ReachableFromPlatformAreas = new List<PlatformArea>();
+        ReachableFromPlatformAreas = new List<Platform>();
         
         for (var angle = 0; angle < 360; angle += 5)
         {
@@ -57,9 +57,9 @@ public class PlayerInfo : MonoBehaviour
                 if (hits[index].collider.CompareTag("Obstacle"))
                     break;
                 
-                PlatformArea platformArea = hits[index].collider.GetComponent<PlatformArea>();
-                if (!ReachableFromPlatformAreas.Contains(platformArea))
-                    ReachableFromPlatformAreas.Add(platformArea);
+                Platform platform = hits[index].collider.GetComponent<Platform>();
+                if (!ReachableFromPlatformAreas.Contains(platform))
+                    ReachableFromPlatformAreas.Add(platform);
             }
         }
 

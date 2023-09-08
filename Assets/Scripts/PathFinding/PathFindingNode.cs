@@ -3,7 +3,7 @@ using System.Collections.Generic;
 public class PathFindingNode
 {
     
-    public PlatformArea LinkedPlatformArea { private set; get; }
+    public Platform LinkedPlatform { private set; get; }
     public PathFindingNode ParentNode;
     public int GCost;
     public int HCost;
@@ -11,9 +11,9 @@ public class PathFindingNode
 
     private PathFinder _pathFinder;
 
-    public PathFindingNode(PlatformArea platform, PathFinder pathFinder)
+    public PathFindingNode(Platform platform, PathFinder pathFinder)
     {
-        LinkedPlatformArea = platform;
+        LinkedPlatform = platform;
         _pathFinder = pathFinder;
     }
 
@@ -21,8 +21,8 @@ public class PathFindingNode
     {
         var list = new List<PathFindingNode>();
 
-        foreach (var destination in LinkedPlatformArea.PossibleDestinations)
-            list.Add(_pathFinder.Graph[destination.DestinationPlatformArea]);
+        foreach (var destination in LinkedPlatform.PossibleDestinations)
+            list.Add(_pathFinder.Graph[destination.DestinationPlatform]);
 
         return list;
     }

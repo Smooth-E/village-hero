@@ -1,72 +1,166 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
+[ExecuteInEditMode]
 public class PlatformConnectionsDefiner : MonoBehaviour
 {
+    
+    // TODO: Define following constants inside a Singleton Scriptable Object
+    private readonly float _entityMass = 1f;
+    private readonly float _entityJumpForce = 30f;
+    private readonly float _entityMovementVelocity = 10f;
+    private readonly float _entityGravityScale = 10f;
 
-    private readonly float _approximateJumpHeight = 3.17f;
+    /// <summary>
+    /// <para>
+    /// Note regarding the initial velocity of a jump:
+    /// Impulse is a change in momentum.
+    /// Momentum is defined as m * u, where m is a mass and u is a velocity.
+    /// </para>
+    /// <para>
+    /// Since when jumping the horizontal velocity of an entity is considered 0,
+    /// the initial velocity for calculating the maximum jump height and
+    /// all of the trajectories needed to find connections is force in Impulse mode divided by mass.
+    /// </para>
+    /// </summary>
+    private float InitialVerticalVelocity => _entityJumpForce / _entityMass;
+
+    private float VerticalGravityAcceleration => Mathf.Abs(Physics2D.gravity.y) * _entityGravityScale;
     
-    [Tooltip("A prefab of a probe object that is spawned to imitate character's behaviour and get the list of possible destination platforms one can get to.")]
-    [SerializeField] private GameObject _probePrefab;
-    
-    private PlatformArea[] _platformAreas;
+    private Platform[] _platforms;
 
     private void Start() =>
         UpdatePlatformList();
 
+#if UNITY_EDITOR
+    private void Update() =>
+        UpdatePlatformList();
+#endif
+    
     private void UpdatePlatformList()
     {
-        _platformAreas = FindObjectsOfType<PlatformArea>();
+        _platforms = FindObjectsOfType<Platform>(true);
         DefineConnections();
     }
 
+    /// <summary>Assigns a list of all possible destinations (connections) for each platform.</summary>
     private void DefineConnections()
     {
-        var parameters = new CreateSceneParameters(LocalPhysicsMode.Physics2D);
-        var simulationScene = SceneManager.CreateScene("Path Builder Physics Scene", parameters);
-
-        foreach (var platformArea in _platformAreas)
+        foreach (var platform in _platforms)
         {
-            var platformGameObject = platformArea.gameObject;
-            var platformTransform = platformGameObject.transform;
-            var position = platformTransform.position;
-            var rotation = platformTransform.rotation;
-            var platformAreaInstance = Instantiate(platformArea, position, rotation);
+            var connections = new List<PathFindingDestination>();
+            var right = platform.RightEdgePosition;
+            var left = platform.LeftEdgePosition;
+            var horizontal = _entityMovementVelocity;
+            var vertical = InitialVerticalVelocity;
             
-            SceneManager.MoveGameObjectToScene(platformAreaInstance.gameObject, simulationScene);
-            DefineConnectionsForPlatform(platformAreaInstance);
+            var fallFromRightEdge = JumpFromEdge(platform, right, horizontal, 0, PathFindingAction.FallFromRightEdge);
+            var fallFromLeftEdge = JumpFromEdge(platform, left, -horizontal, 0, PathFindingAction.FallFromLeftEdge);
+
+            var fallFromAnyEdge = new List<PathFindingDestination>();
+            foreach (var rightConnection in fallFromRightEdge)
+            {
+                foreach (var leftConnection in fallFromLeftEdge)
+                {
+                    var rightPlatform = rightConnection.DestinationPlatform;
+                    var leftPlatform = leftConnection.DestinationPlatform;
+                    
+                    if (rightPlatform == leftPlatform)
+                        fallFromAnyEdge.Add(new(rightPlatform, PathFindingAction.JumpFromAnyEdge));
+                }
+            }
+            
+            connections.AddRange(fallFromRightEdge);
+            connections.AddRange(fallFromLeftEdge);
+            connections.AddRange(fallFromAnyEdge);
+            
+            connections.AddRange(JumpFromEdge(platform, right, horizontal, vertical, PathFindingAction.JumpFromRightEdge));
+            connections.AddRange(JumpFromEdge(platform, left, -horizontal, vertical, PathFindingAction.JumpFromLeftEdge));
+            connections.AddRange(JumpAnywhereUnder(platform));
+
+            platform.PossibleDestinations = connections;
         }
+    }
+    
+    private List<PathFindingDestination> JumpFromEdge(
+        Platform platform,
+        Vector3 edgePosition,
+        float horizontalVelocity, 
+        float initialVerticalVelocity, 
+        PathFindingAction action)
+    {
+        var destinations = new List<PathFindingDestination>();
+
+        foreach (var otherPlatform in _platforms)
+        {
+            if (platform == otherPlatform)
+                continue;
             
+            var otherRightEdge = otherPlatform.RightEdgePosition;
+            var otherLeftEdge = otherPlatform.LeftEdgePosition;
+            var x = GetXForAttitude(horizontalVelocity, initialVerticalVelocity, edgePosition, otherRightEdge.y);
+
+            if (x <= float.NegativeInfinity)
+                continue;
+            
+            if (otherLeftEdge.x < x && otherRightEdge.x > x)
+                destinations.Add(new(otherPlatform, action));
+        }
+        
+        return destinations;
+    }
+    
+    private List<PathFindingDestination> JumpAnywhereUnder(Platform platform)
+    {
+        var destinations = new List<PathFindingDestination>();
+        var maximumHeight = Mathf.Pow(InitialVerticalVelocity, 2) / (VerticalGravityAcceleration * 2);
+        
+        foreach (var otherPlatform in _platforms)
+        {
+            if (platform == otherPlatform)
+                continue;
+            
+            if (otherPlatform.RightEdgePosition.y < platform.RightEdgePosition.y + maximumHeight)
+                destinations.Add(new(otherPlatform, PathFindingAction.JumpAnywhereUnder));
+        }
+        
+        return destinations;
     }
 
-    private void DefineConnectionsForPlatform(PlatformArea platformArea)
+    private float GetAttitudeAfterJump(
+        float horizontalVelocity, 
+        float verticalVelocity, 
+        Vector3 startPosition, 
+        float desiredX) 
     {
-        platformArea.PossibleDestinations = new List<PathFindingDestination>();
-
-        foreach (var result in JumpAnywhere(platformArea))
-        {
-            var destination = new PathFindingDestination(result, PathFindingAction.JumpAnywhereUnder);
-            platformArea.PossibleDestinations.Add(destination);
-        }
+        var deltaX = desiredX - startPosition.x;
+        var time = Mathf.Abs(deltaX / horizontalVelocity);
+        return verticalVelocity * time - VerticalGravityAcceleration * Mathf.Pow(time, 2) / 2;
     }
 
-    private List<PlatformArea> JumpAnywhere(PlatformArea platformArea)
+    private float GetXForAttitude(
+        float horizontalVelocity,
+        float verticalVelocity,
+        Vector3 startPosition,
+        float desiredY) 
     {
-        Vector2 pointA = platformArea.RightEdgePosition;
-        Vector2 pointB = platformArea.LeftEdgePosition + Vector3.up * _approximateJumpHeight;
+        // y = vertical * time - g * t * t / 2
+        // Finding the time means solving a quadratic polynomial
+        // (g / 2) * t^2 - v * t + y = 0
         
-        var filter = new ContactFilter2D();
-        filter.layerMask = LayerMask.GetMask("Platform Area");
-        
-        List<Collider2D> results = new();
-        Physics2D.OverlapArea(pointA, pointB, filter, results);
+        var a = VerticalGravityAcceleration / 2;
+        var b =  verticalVelocity;
+        var discriminant = b - 4 * a * desiredY;
 
-        List<PlatformArea> returnable = new();
-        foreach (var platformAreaCollider in results)
-            returnable.Add(platformAreaCollider.GetComponent<PlatformArea>());
-        
-        return returnable;
+        // Object will never reach the desired attitude
+        if (discriminant < 0)
+            return float.NegativeInfinity;
+
+        var root = (float)Math.Sqrt(discriminant);
+        var time = Mathf.Max((-b + root) / 2 / a, (-b - root) / 2 / a);
+
+        return startPosition.x + horizontalVelocity * time;
     }
     
 }

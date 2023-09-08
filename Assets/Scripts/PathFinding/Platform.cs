@@ -5,46 +5,40 @@ using UnityEngine.Serialization;
 
 [Serializable]
 [ExecuteInEditMode]
-[RequireComponent(typeof(BoxCollider2D))]
-public class PlatformArea : MonoBehaviour
+public class Platform : MonoBehaviour
 {
+
+    [SerializeField] private BoxCollider2D _areaCollider;
+    [SerializeField] private Transform _groundTransform;
     
     [FormerlySerializedAs("_possibleDestinations")] public List<PathFindingDestination> PossibleDestinations;
 
-    public BoxCollider2D AreaCollider { private set; get; }
-    public float LeftEdge { private set; get; }
-    public float RightEdge { private set; get; }
+    public BoxCollider2D AreaCollider => _areaCollider;
+    
+    public float LeftEdge => transform.position.x + AreaCollider.offset.x - GetAreaWidth() / 2f;
+    public float RightEdge => transform.position.x + AreaCollider.offset.x + GetAreaWidth() / 2f;
     public float Width => RightEdge - LeftEdge;
-    public Vector3 LeftEdgePosition => new Vector3(LeftEdge, transform.position.y, transform.position.z);
-    public Vector3 RightEdgePosition => new Vector3(RightEdge, transform.position.y, transform.position.z);
-
-    private void Awake()
-    {
-        AreaCollider = GetComponent<BoxCollider2D>();
-        var colliderSize = AreaCollider.size;
-        var areaWidth = colliderSize.x * transform.localScale.x;
-        var areaOffset = AreaCollider.offset;
-        LeftEdge = transform.position.x + areaOffset.x - areaWidth / 2f;
-        RightEdge = transform.position.x + areaOffset.x + areaWidth / 2f;
-    }
+    public Vector3 LeftEdgePosition => new(LeftEdge, _groundTransform.position.y, _groundTransform.position.z);
+    public Vector3 RightEdgePosition => new(RightEdge, _groundTransform.position.y, _groundTransform.position.z);
 
     private void OnDrawGizmos()
     {
         foreach (var destination in PossibleDestinations)
         {
-            var destinationPlatform = destination.DestinationPlatformArea;
+            var destinationPlatform = destination.DestinationPlatform;
 
             if (destinationPlatform == null)
                 continue;
             
-            var destinationPosition = destination.DestinationPlatformArea.transform.position;
+            var destinationPosition = destination.DestinationPlatform.transform.position;
+            destinationPosition.y = destination.DestinationPlatform.RightEdgePosition.y;
             var position = transform.position;
 
             Vector3 temporaryValue;
             switch (destination.Action)
             {
                 case PathFindingAction.JumpAnywhereUnder:
-                    DrawArrow.ForGizmos(position, destinationPosition, Color.blue);
+                    // DrawArrow.ForGizmos(position, destinationPosition, Color.blue);
                     break;
                 
                 case PathFindingAction.FallFromAnyEdge:
@@ -57,11 +51,11 @@ public class PlatformArea : MonoBehaviour
                     break;
                 
                 case PathFindingAction.FallFromLeftEdge:
-                    DrawArrow.ForGizmos(LeftEdgePosition, destinationPlatform.RightEdgePosition, Color.green);
+                    DrawArrow.ForGizmos(LeftEdgePosition, destinationPosition, Color.green);
                     break;
                 
                 case PathFindingAction.FallFromRightEdge:
-                    DrawArrow.ForGizmos(RightEdgePosition, destinationPlatform.LeftEdgePosition, Color.green);
+                    DrawArrow.ForGizmos(RightEdgePosition, destinationPosition, new Color32(117, 133, 185, 255));
                     break;
                 
                 case PathFindingAction.JumpFromAnyEdge:
@@ -74,24 +68,24 @@ public class PlatformArea : MonoBehaviour
                     break;
                 
                 case PathFindingAction.JumpFromLeftEdge:
-                    DrawArrow.ForGizmos(LeftEdgePosition, destinationPlatform.RightEdgePosition, Color.cyan);
+                    DrawArrow.ForGizmos(LeftEdgePosition, destinationPosition, Color.cyan);
                     break;
                 
                 case PathFindingAction.JumpFromRightEdge:
-                    DrawArrow.ForGizmos(RightEdgePosition, destinationPlatform.LeftEdgePosition, Color.cyan);
+                    DrawArrow.ForGizmos(RightEdgePosition, destinationPosition, new Color32(255, 165, 0, 255));
                     break;
             }
         }
     }
 
-    public PathFindingAction GetActionForDestination(PlatformArea destinationPlatformArea)
+    public PathFindingAction GetActionForDestination(Platform destinationPlatform)
     {
         PathFindingAction action = 0;
         bool platformFound = false;
 
         foreach (var destination in PossibleDestinations)
         {
-            if (destination.DestinationPlatformArea != destinationPlatformArea)
+            if (destination.DestinationPlatform != destinationPlatform)
                 continue;
             
             action = destination.Action;
@@ -104,5 +98,8 @@ public class PlatformArea : MonoBehaviour
 
         return action;
     }
+
+    private float GetAreaWidth() =>
+        _areaCollider.size.x * transform.localScale.x;
 
 }
