@@ -4,7 +4,7 @@ using UnityEngine;
 public class CharacterGrounder : MonoBehaviour
 {
     
-    [SerializeField] private float _circleRadius = 0.2f;
+    private readonly float _circleRadius = 0.2f;
 
     public bool IsGrounded { private set; get; }
 
@@ -12,7 +12,7 @@ public class CharacterGrounder : MonoBehaviour
 
     private void FixedUpdate()
     {
-        var layerMask = LayerMask.GetMask(new string[]{ "Platform" });
+        var layerMask = LayerMask.GetMask("Platform");
         var collider = Physics2D.OverlapCircle(transform.position, _circleRadius, layerMask);
         
         var nowGrounded = collider != null;

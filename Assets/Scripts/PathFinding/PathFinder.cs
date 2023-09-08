@@ -1,21 +1,23 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public static class PathFinder
+public class PathFinder : MonoBehaviour
 {
-    
+
+    public Dictionary<PlatformArea, PathFindingNode> Graph { private set; get; }
+
     /// <summary>
     /// Finds the shortest path between two platforms and returns a list of nodes to follow.
     /// </summary>
     /// <param name="start">The starting platform area</param>
     /// <param name="destination">The destination platform area</param>
     /// <returns>An ordered list of path finding nodes to follow</returns>
-    public static List<PathFindingNode> FindPath(PlatformArea start, PlatformArea destination)
+    public List<PathFindingNode> FindPath(PlatformArea start, PlatformArea destination)
     {
-        PathFindingGraph.Initialize();
+        InitializeGraph();
 
-        var startNode = PathFindingGraph.Nodes[start];
-        var destinationNode = PathFindingGraph.Nodes[destination];
+        var startNode = Graph[start];
+        var destinationNode = Graph[destination];
 
         var openList = new List<PathFindingNode>();
         var visitedNodes = new HashSet<PathFindingNode>();
@@ -70,7 +72,7 @@ public static class PathFinder
         return null;
     }
 
-    private static List<PathFindingNode> CreateFinalPath(PathFindingNode startNode, PathFindingNode destinationNode)
+    private List<PathFindingNode> CreateFinalPath(PathFindingNode startNode, PathFindingNode destinationNode)
     {
         var path = new List<PathFindingNode>();
         var currentNode = destinationNode;
@@ -85,6 +87,14 @@ public static class PathFinder
         path.Reverse();
         Debug.Log($"Final path length: {path.Count}");
         return path;
+    }
+
+    private void InitializeGraph()
+    {
+        Graph = new Dictionary<PlatformArea, PathFindingNode>();
+
+        foreach (var platform in FindObjectsOfType<PlatformArea>())
+            Graph.Add(platform, new PathFindingNode(platform, this));
     }
 
 }

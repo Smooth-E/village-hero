@@ -7,28 +7,16 @@ using UnityEngine;
 /// </summary>
 public class EnemyMovementGovernor : MonoBehaviour
 {
-
-    /// <summary>
-    /// An action type tells the reason why the enemy is currently moving
-    /// </summary>
-    private enum ActionType
-    {
-        /// <summary>The purpose of enemy's movement is currently unknown or not set, yet</summary>
-        None,
-        /// <summary>The enemy have successfully found a target and is now moving to it</summary>
-        Traveling,
-        /// <summary>The target is unreachable and the enemy is roaming around</summary>
-        Roaming
-    }
     
     private const float TargetCheckInterval = 0.01f;
     
     private Coroutine _currentActionCoroutine;
     private PlatformArea _currentPlatformArea;
+    private PathFinder _pathFinder;
 
     private PlatformArea _tempHighlightPlatformArea;
     private List<PathFindingNode> _tempLastPath;
-    private ActionType _currentActionType = ActionType.None; 
+    private EnemyActionType _currentEnemyActionType = EnemyActionType.None; 
 
     [SerializeField] private Transform _originTransform;
     [SerializeField] private CharacterGrounder _grounder;
@@ -40,6 +28,7 @@ public class EnemyMovementGovernor : MonoBehaviour
     private void Awake()
     {
         _grounder.OnGrounded += OnGrounded;
+        _pathFinder = FindObjectOfType<PathFinder>();
         StartCoroutine(TargetCheckCoroutine());
     }
 
@@ -84,7 +73,7 @@ public class EnemyMovementGovernor : MonoBehaviour
     private void GetToTargetIfNeeded()
     {
         var newTargetStatus = _targetFinder.GetTargetTransform() != null;
-        var requiresAction = !newTargetStatus && _currentActionType != ActionType.Traveling;
+        var requiresAction = !newTargetStatus && _currentEnemyActionType != EnemyActionType.Traveling;
         TargetAvailable = newTargetStatus;
 
         if (requiresAction)
@@ -109,7 +98,7 @@ public class EnemyMovementGovernor : MonoBehaviour
         }
 
 
-        if (closestDistance == -1 && _currentActionType != ActionType.Roaming)
+        if (closestDistance == -1 && _currentEnemyActionType != EnemyActionType.Roaming)
             _currentActionCoroutine = StartCoroutine(HangAroundCoroutine());
         else if (closestDistance != -1)
             _currentActionCoroutine = StartCoroutine(MoveToPlatformCoroutine(closestPlatformArea));
@@ -117,7 +106,7 @@ public class EnemyMovementGovernor : MonoBehaviour
 
     private void StopCurrentAction()
     {
-        _currentActionType = ActionType.None;
+        _currentEnemyActionType = EnemyActionType.None;
         if (_currentActionCoroutine != null)
         {
             StopCoroutine(_currentActionCoroutine);
@@ -128,7 +117,7 @@ public class EnemyMovementGovernor : MonoBehaviour
     private IEnumerator MoveToPlatformCoroutine(PlatformArea destinationPlatformArea)
     {
 
-        var path = PathFinder.FindPath(_currentPlatformArea, destinationPlatformArea);
+        var path = _pathFinder.FindPath(_currentPlatformArea, destinationPlatformArea);
         _tempLastPath = path;
 
         if (path == null || path.Count == 0)
@@ -138,7 +127,7 @@ public class EnemyMovementGovernor : MonoBehaviour
         }
 
         StopCurrentAction();
-        _currentActionType = ActionType.Traveling;
+        _currentEnemyActionType = EnemyActionType.Traveling;
 
         for (var i = 0; i < path.Count - 1; i++)
         {
@@ -181,7 +170,7 @@ public class EnemyMovementGovernor : MonoBehaviour
             yield return null;
         }
 
-        _currentActionType = ActionType.None;
+        _currentEnemyActionType = EnemyActionType.None;
     }
 
     private float GetClosestEdge()
@@ -252,7 +241,7 @@ public class EnemyMovementGovernor : MonoBehaviour
     private IEnumerator HangAroundCoroutine()
     {
         StopCurrentAction();
-        _currentActionType = ActionType.Roaming;
+        _currentEnemyActionType = EnemyActionType.Roaming;
         _tempLastPath = null;
 
         var direction = Random.Range(0, 2) == 0 ? 0.5f : -0.5f;
