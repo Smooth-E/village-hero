@@ -148,7 +148,7 @@ public class PlatformConnectionsDefiner : MonoBehaviour
         // (g / 2) * t^2 - v * t + y = 0
         
         var a = VerticalGravityAcceleration / 2;
-        var b =  verticalVelocity;
+        var b =  -verticalVelocity;
         var discriminant = b * b - 4 * a * desiredY;
 
         // Object will never reach the desired attitude
