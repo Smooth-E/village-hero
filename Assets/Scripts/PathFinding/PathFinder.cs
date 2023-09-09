@@ -1,100 +1,103 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
-public class PathFinder : MonoBehaviour
+namespace PathFinding
 {
-
-    public Dictionary<Platform, PathFindingNode> Graph { private set; get; }
-
-    /// <summary>
-    /// Finds the shortest path between two platforms and returns a list of nodes to follow.
-    /// </summary>
-    /// <param name="start">The starting platform area</param>
-    /// <param name="destination">The destination platform area</param>
-    /// <returns>An ordered list of path finding nodes to follow</returns>
-    public List<PathFindingNode> FindPath(Platform start, Platform destination)
+    public class PathFinder : MonoBehaviour
     {
-        InitializeGraph();
 
-        var startNode = Graph[start];
-        var destinationNode = Graph[destination];
+        public Dictionary<Platform, PathFindingNode> Graph { private set; get; }
 
-        var openList = new List<PathFindingNode>();
-        var visitedNodes = new HashSet<PathFindingNode>();
-
-        openList.Add(startNode);
-
-        while (openList.Count > 0)
+        /// <summary>
+        /// Finds the shortest path between two platforms and returns a list of nodes to follow.
+        /// </summary>
+        /// <param name="start">The starting platform area</param>
+        /// <param name="destination">The destination platform area</param>
+        /// <returns>An ordered list of path finding nodes to follow</returns>
+        public List<PathFindingNode> FindPath(Platform start, Platform destination)
         {
-            var currentNode = openList[0];
+            InitializeGraph();
 
-            for (var i = 1; i < openList.Count; i++)
+            var startNode = Graph[start];
+            var destinationNode = Graph[destination];
+
+            var openList = new List<PathFindingNode>();
+            var visitedNodes = new HashSet<PathFindingNode>();
+
+            openList.Add(startNode);
+
+            while (openList.Count > 0)
             {
-                var condition = 
-                    openList[i].FCost < currentNode.FCost || 
-                    openList[i].FCost == currentNode.FCost && 
-                    openList[i].HCost < currentNode.HCost;
-                
-                if (condition)
-                    currentNode = openList[i];
-            }
+                var currentNode = openList[0];
 
-            openList.Remove(currentNode);
-            visitedNodes.Add(currentNode);
-
-            if (currentNode == destinationNode)
-                return CreateFinalPath(startNode, destinationNode);
-
-            var neighboringNodes = currentNode.GetNeighboringNodes();
-            // Debug.Log($"Found neighboring nodes: {neighboringNodes.Count}");
-
-            foreach (var neighboringNode in neighboringNodes)
-            {
-                if (visitedNodes.Contains(neighboringNode))
-                    continue;
-                
-                // Мы не будем использовать вычисление Манхеттенской длины, 
-                // так как нам не важно фактическое расстояние между нодами
-                var moveCost = currentNode.GCost + 1;
-
-                if (moveCost < neighboringNode.GCost || !openList.Contains(neighboringNode))
+                for (var i = 1; i < openList.Count; i++)
                 {
-                    neighboringNode.GCost = moveCost;
-                    neighboringNode.HCost = 1;
-                    neighboringNode.ParentNode = currentNode;
+                    var condition = 
+                        openList[i].FCost < currentNode.FCost || 
+                        openList[i].FCost == currentNode.FCost && 
+                        openList[i].HCost < currentNode.HCost;
+                
+                    if (condition)
+                        currentNode = openList[i];
+                }
 
-                    if (!openList.Contains(neighboringNode))
-                        openList.Add(neighboringNode);
+                openList.Remove(currentNode);
+                visitedNodes.Add(currentNode);
+
+                if (currentNode == destinationNode)
+                    return CreateFinalPath(startNode, destinationNode);
+
+                var neighboringNodes = currentNode.GetNeighboringNodes();
+                // Debug.Log($"Found neighboring nodes: {neighboringNodes.Count}");
+
+                foreach (var neighboringNode in neighboringNodes)
+                {
+                    if (visitedNodes.Contains(neighboringNode))
+                        continue;
+                
+                    // Мы не будем использовать вычисление Манхеттенской длины, 
+                    // так как нам не важно фактическое расстояние между нодами
+                    var moveCost = currentNode.GCost + 1;
+
+                    if (moveCost < neighboringNode.GCost || !openList.Contains(neighboringNode))
+                    {
+                        neighboringNode.GCost = moveCost;
+                        neighboringNode.HCost = 1;
+                        neighboringNode.ParentNode = currentNode;
+
+                        if (!openList.Contains(neighboringNode))
+                            openList.Add(neighboringNode);
+                    }
                 }
             }
+
+            return null;
         }
 
-        return null;
-    }
-
-    private List<PathFindingNode> CreateFinalPath(PathFindingNode startNode, PathFindingNode destinationNode)
-    {
-        var path = new List<PathFindingNode>();
-        var currentNode = destinationNode;
-
-        while (currentNode != startNode)
+        private List<PathFindingNode> CreateFinalPath(PathFindingNode startNode, PathFindingNode destinationNode)
         {
-            path.Add(currentNode);
-            currentNode = currentNode.ParentNode;
+            var path = new List<PathFindingNode>();
+            var currentNode = destinationNode;
+
+            while (currentNode != startNode)
+            {
+                path.Add(currentNode);
+                currentNode = currentNode.ParentNode;
+            }
+
+            path.Add(startNode);
+            path.Reverse();
+            Debug.Log($"Final path length: {path.Count}");
+            return path;
         }
 
-        path.Add(startNode);
-        path.Reverse();
-        Debug.Log($"Final path length: {path.Count}");
-        return path;
+        private void InitializeGraph()
+        {
+            Graph = new Dictionary<Platform, PathFindingNode>();
+
+            foreach (var platform in FindObjectsOfType<Platform>())
+                Graph.Add(platform, new PathFindingNode(platform, this));
+        }
+
     }
-
-    private void InitializeGraph()
-    {
-        Graph = new Dictionary<Platform, PathFindingNode>();
-
-        foreach (var platform in FindObjectsOfType<Platform>())
-            Graph.Add(platform, new PathFindingNode(platform, this));
-    }
-
 }

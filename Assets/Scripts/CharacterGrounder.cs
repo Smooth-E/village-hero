@@ -1,4 +1,5 @@
 using System;
+using PathFinding;
 using UnityEngine;
 
 public class CharacterGrounder : MonoBehaviour

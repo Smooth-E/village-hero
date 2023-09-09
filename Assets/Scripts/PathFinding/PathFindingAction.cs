@@ -1,10 +1,13 @@
-public enum PathFindingAction
+namespace PathFinding
 {
-    FallFromRightEdge,
-    FallFromLeftEdge,
-    FallFromAnyEdge,
-    JumpFromRightEdge,
-    JumpFromLeftEdge,
-    JumpFromAnyEdge,
-    JumpAnywhereUnder,
+    public enum PathFindingAction
+    {
+        FallFromRightEdge,
+        FallFromLeftEdge,
+        FallFromAnyEdge,
+        JumpFromRightEdge,
+        JumpFromLeftEdge,
+        JumpFromAnyEdge,
+        JumpAnywhereUnder,
+    }
 }

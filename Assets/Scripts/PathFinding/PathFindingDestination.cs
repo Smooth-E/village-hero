@@ -1,18 +1,21 @@
 using System;
 using UnityEngine.Serialization;
 
-[Serializable]
-public class PathFindingDestination
+namespace PathFinding
 {
-    [FormerlySerializedAs("DestinationPlatformArea")] public Platform DestinationPlatform;
-    public PathFindingAction Action;
-
-    public PathFindingDestination() { }
-
-    public PathFindingDestination(Platform platform, PathFindingAction action)
+    [Serializable]
+    public class PathFindingDestination
     {
-        DestinationPlatform = platform;
-        Action = action;
-    }
+        [FormerlySerializedAs("DestinationPlatformArea")] public Platform DestinationPlatform;
+        public PathFindingAction Action;
+
+        public PathFindingDestination() { }
+
+        public PathFindingDestination(Platform platform, PathFindingAction action)
+        {
+            DestinationPlatform = platform;
+            Action = action;
+        }
     
+    }
 }

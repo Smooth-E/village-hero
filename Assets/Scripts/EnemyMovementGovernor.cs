@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections;
+using PathFinding;
 using UnityEngine;
 
 /// <summary>

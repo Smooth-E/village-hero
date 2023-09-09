@@ -1,11 +1,9 @@
 using System;
+using ScriptableObjects;
 using UnityEngine;
 
 public class CharacterMover : MonoBehaviour
 {
-
-    private readonly float _jumpForce = 30f;
-    private readonly float _moveSpeed = 10f;
 
     private float _horizontalVelocity;
 
@@ -20,15 +18,24 @@ public class CharacterMover : MonoBehaviour
 
     public event Action OnJump;
 
-    private void Update() =>
-        _rigidbody.velocity = new Vector2(_horizontalVelocity * _moveSpeed, _rigidbody.velocity.y);
+    private void Awake()
+    {
+        _rigidbody.mass = EntityParameters.Mass;
+        _rigidbody.gravityScale = EntityParameters.GravityScale;
+    }
+
+    private void Update()
+    {
+        var xVelocity = _horizontalVelocity * EntityParameters.MovementVelocity;
+        _rigidbody.velocity = new Vector2(xVelocity, _rigidbody.velocity.y);
+    }
 
     public void Jump()
     {
         if (_grounder.IsGrounded)
         {
             OnJump?.Invoke();
-            _rigidbody.AddForce(new Vector2(0, _jumpForce), ForceMode2D.Impulse);
+            _rigidbody.AddForce(new Vector2(0, EntityParameters.JumpForce), ForceMode2D.Impulse);
         }
     }
 

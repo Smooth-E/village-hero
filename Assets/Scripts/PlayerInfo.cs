@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using PathFinding;
 using UnityEngine;
 
 public class PlayerInfo : MonoBehaviour
