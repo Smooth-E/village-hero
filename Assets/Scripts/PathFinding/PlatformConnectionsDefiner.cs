@@ -57,40 +57,37 @@ public class PlatformConnectionsDefiner : MonoBehaviour
             
             var fallFromRightEdge = JumpFromEdge(platform, right, horizontal, 0, PathFindingAction.FallFromRightEdge);
             var fallFromLeftEdge = JumpFromEdge(platform, left, -horizontal, 0, PathFindingAction.FallFromLeftEdge);
-
-            var fallFromAnyEdge = new List<PathFindingDestination>();
-            foreach (var rightConnection in fallFromRightEdge)
-            {
-                foreach (var leftConnection in fallFromLeftEdge)
-                {
-                    var rightPlatform = rightConnection.DestinationPlatform;
-                    var leftPlatform = leftConnection.DestinationPlatform;
-                    
-                    if (rightPlatform == leftPlatform)
-                        fallFromAnyEdge.Add(new(rightPlatform, PathFindingAction.JumpFromAnyEdge));
-                }
-            }
             
-            connections.AddRange(fallFromRightEdge);
-            connections.AddRange(fallFromLeftEdge);
-            connections.AddRange(fallFromAnyEdge);
+            if (fallFromLeftEdge != null && fallFromRightEdge == fallFromLeftEdge)
+                connections.Add(new(platform, PathFindingAction.FallFromAnyEdge));
             
-            connections.AddRange(JumpFromEdge(platform, right, horizontal, vertical, PathFindingAction.JumpFromRightEdge));
-            connections.AddRange(JumpFromEdge(platform, left, -horizontal, vertical, PathFindingAction.JumpFromLeftEdge));
+            AddToListIfNotNull(connections, fallFromRightEdge);
+            AddToListIfNotNull(connections, fallFromLeftEdge);
+            
+            var jumpFromRightEdge = JumpFromEdge(platform, right, horizontal, vertical, PathFindingAction.JumpFromRightEdge);
+            var jumpFromLeftEdge = JumpFromEdge(platform, left, -horizontal, vertical, PathFindingAction.JumpFromLeftEdge);
+            
+            if (jumpFromLeftEdge != null && jumpFromLeftEdge == jumpFromRightEdge)
+                connections.Add(new(platform, PathFindingAction.JumpFromAnyEdge));
+            
+            AddToListIfNotNull(connections, jumpFromRightEdge);
+            AddToListIfNotNull(connections, jumpFromLeftEdge);
+            
             connections.AddRange(JumpAnywhereUnder(platform));
 
             platform.PossibleDestinations = connections;
         }
     }
     
-    private List<PathFindingDestination> JumpFromEdge(
+    private PathFindingDestination JumpFromEdge(
         Platform platform,
         Vector3 edgePosition,
         float horizontalVelocity, 
         float initialVerticalVelocity, 
         PathFindingAction action)
     {
-        var destinations = new List<PathFindingDestination>();
+        PathFindingDestination destination = null;
+        var highestPlatformY = float.NegativeInfinity;
 
         foreach (var otherPlatform in _platforms)
         {
@@ -103,12 +100,15 @@ public class PlatformConnectionsDefiner : MonoBehaviour
 
             if (x <= float.NegativeInfinity)
                 continue;
-            
-            if (otherLeftEdge.x < x && otherRightEdge.x > x)
-                destinations.Add(new(otherPlatform, action));
+
+            if (otherLeftEdge.x < x && otherRightEdge.x > x && otherRightEdge.y > highestPlatformY)
+            {
+                destination = new(otherPlatform, action);
+                highestPlatformY = otherLeftEdge.y;
+            }
         }
         
-        return destinations;
+        return destination;
     }
     
     private List<PathFindingDestination> JumpAnywhereUnder(Platform platform)
@@ -135,6 +135,12 @@ public class PlatformConnectionsDefiner : MonoBehaviour
         }
         
         return destinations;
+    }
+
+    private void AddToListIfNotNull(List<PathFindingDestination> list, PathFindingDestination destination)
+    {
+        if (destination != null)
+            list.Add(destination);
     }
     
     private float GetXForAttitude(

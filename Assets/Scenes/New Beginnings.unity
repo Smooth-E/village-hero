@@ -199,11 +199,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1917993170786614585, guid: 2a07a920ceaa250f794b01e626bc2481, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 16.87
+      value: 18.05
       objectReference: {fileID: 0}
     - target: {fileID: 1917993170786614585, guid: 2a07a920ceaa250f794b01e626bc2481, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 10.39
+      value: 6.57
       objectReference: {fileID: 0}
     - target: {fileID: 1917993170786614585, guid: 2a07a920ceaa250f794b01e626bc2481, type: 3}
       propertyPath: m_LocalPosition.z
@@ -260,7 +260,7 @@ PrefabInstance:
     - target: {fileID: 2378617374455651121, guid: 2a07a920ceaa250f794b01e626bc2481, type: 3}
       propertyPath: PossibleDestinations.Array.data[1].DestinationPlatform
       value: 
-      objectReference: {fileID: 361387137}
+      objectReference: {fileID: 1500255169}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -461,7 +461,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2378617374455651121, guid: 2a07a920ceaa250f794b01e626bc2481, type: 3}
       propertyPath: PossibleDestinations.Array.size
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2378617374455651121, guid: 2a07a920ceaa250f794b01e626bc2481, type: 3}
       propertyPath: PossibleDestinations.Array.data[0].Action
@@ -490,7 +490,7 @@ PrefabInstance:
     - target: {fileID: 2378617374455651121, guid: 2a07a920ceaa250f794b01e626bc2481, type: 3}
       propertyPath: PossibleDestinations.Array.data[2].DestinationPlatform
       value: 
-      objectReference: {fileID: 361387137}
+      objectReference: {fileID: 1684466878}
     - target: {fileID: 2378617374455651121, guid: 2a07a920ceaa250f794b01e626bc2481, type: 3}
       propertyPath: PossibleDestinations.Array.data[3].DestinationPlatform
       value: 
@@ -505,6 +505,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7954637575392853482, guid: 5a5bffa99112a81609955cca4b85b060, type: 3}
   m_PrefabInstance: {fileID: 938879556}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1500255169 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2378617374455651121, guid: 2a07a920ceaa250f794b01e626bc2481, type: 3}
+  m_PrefabInstance: {fileID: 1144803973}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15a07121533db02d385d8d788fc8f343, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1684466877 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1917993170786614588, guid: 2a07a920ceaa250f794b01e626bc2481, type: 3}
@@ -543,7 +554,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1903342791736987117, guid: 57f71cdac6720d3ebba691d0768d6589, type: 3}
       propertyPath: PossibleDestinations.Array.size
-      value: 4
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1903342791736987117, guid: 57f71cdac6720d3ebba691d0768d6589, type: 3}
+      propertyPath: PossibleDestinations.Array.data[0].Action
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1903342791736987117, guid: 57f71cdac6720d3ebba691d0768d6589, type: 3}
       propertyPath: PossibleDestinations.Array.data[1].Action
@@ -573,6 +588,26 @@ PrefabInstance:
       propertyPath: PossibleDestinations.Array.data[3].DestinationPlatform
       value: 
       objectReference: {fileID: 361387137}
+    - target: {fileID: 6422746633180225601, guid: 57f71cdac6720d3ebba691d0768d6589, type: 3}
+      propertyPath: PossibleDestinations.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6422746633180225601, guid: 57f71cdac6720d3ebba691d0768d6589, type: 3}
+      propertyPath: PossibleDestinations.Array.data[0].Action
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6422746633180225601, guid: 57f71cdac6720d3ebba691d0768d6589, type: 3}
+      propertyPath: PossibleDestinations.Array.data[1].Action
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6422746633180225601, guid: 57f71cdac6720d3ebba691d0768d6589, type: 3}
+      propertyPath: PossibleDestinations.Array.data[0].DestinationPlatform
+      value: 
+      objectReference: {fileID: 144509117}
+    - target: {fileID: 6422746633180225601, guid: 57f71cdac6720d3ebba691d0768d6589, type: 3}
+      propertyPath: PossibleDestinations.Array.data[1].DestinationPlatform
+      value: 
+      objectReference: {fileID: 144509117}
     - target: {fileID: 7896879249527291892, guid: 57f71cdac6720d3ebba691d0768d6589, type: 3}
       propertyPath: m_LocalPosition.x
       value: 11.267531
