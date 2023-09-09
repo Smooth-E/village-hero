@@ -136,7 +136,7 @@ public class PlatformConnectionsDefiner : MonoBehaviour
         
         return destinations;
     }
-
+    
     private float GetXForAttitude(
         float horizontalVelocity,
         float verticalVelocity,
@@ -149,7 +149,8 @@ public class PlatformConnectionsDefiner : MonoBehaviour
         
         var a = VerticalGravityAcceleration / 2;
         var b =  -verticalVelocity;
-        var discriminant = b * b - 4 * a * desiredY;
+        var c = desiredY - startPosition.y;
+        var discriminant = b * b - 4 * a * c;
 
         // Object will never reach the desired attitude
         if (discriminant < 0)

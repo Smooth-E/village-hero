@@ -15,14 +15,18 @@ public class Platform : MonoBehaviour
 
     public BoxCollider2D AreaCollider => _areaCollider;
     
-    public float LeftEdge => transform.position.x + AreaCollider.offset.x - GetAreaWidth() / 2f;
-    public float RightEdge => transform.position.x + AreaCollider.offset.x + GetAreaWidth() / 2f;
+    public float LeftEdge => _areaCollider.transform.position.x + AreaCollider.offset.x - GetAreaWidth() / 2f;
+    public float RightEdge => _areaCollider.transform.position.x + AreaCollider.offset.x + GetAreaWidth() / 2f;
     public float Width => RightEdge - LeftEdge;
     public Vector3 LeftEdgePosition => GetGroundPositionWithX(LeftEdge);
     public Vector3 RightEdgePosition => GetGroundPositionWithX(RightEdge);
 
     private void OnDrawGizmos()
     {
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawSphere(RightEdgePosition, 0.1f);
+        Gizmos.DrawSphere(LeftEdgePosition, 0.1f);
+        
         foreach (var destination in PossibleDestinations)
         {
             var destinationPlatform = destination.DestinationPlatform;
@@ -30,11 +34,14 @@ public class Platform : MonoBehaviour
             if (destinationPlatform == null)
                 continue;
             
-            var destinationPosition = destination.DestinationPlatform.transform.position;
-            destinationPosition.y = destination.DestinationPlatform.RightEdgePosition.y;
-            var position = transform.position;
+            var destinationPosition = 
+                destination.DestinationPlatform._groundCollider.transform.position +
+                (Vector3)destination.DestinationPlatform._groundCollider.offset;
+            var position = _groundCollider.transform.position + (Vector3)_groundCollider.offset;
 
             Vector3 temporaryValue;
+            Color lightBlue = new Color32(117, 133, 185, 255);
+            Color orange = new Color32(255, 165, 0, 255);
             switch (destination.Action)
             {
                 case PathFindingAction.JumpAnywhereUnder:
@@ -55,7 +62,7 @@ public class Platform : MonoBehaviour
                     break;
                 
                 case PathFindingAction.FallFromRightEdge:
-                    DrawArrow.ForGizmos(RightEdgePosition, destinationPosition, new Color32(117, 133, 185, 255));
+                    DrawArrow.ForGizmos(RightEdgePosition, destinationPosition, lightBlue);
                     break;
                 
                 case PathFindingAction.JumpFromAnyEdge:
@@ -72,7 +79,7 @@ public class Platform : MonoBehaviour
                     break;
                 
                 case PathFindingAction.JumpFromRightEdge:
-                    DrawArrow.ForGizmos(RightEdgePosition, destinationPosition, new Color32(255, 165, 0, 255));
+                    DrawArrow.ForGizmos(RightEdgePosition, destinationPosition, orange);
                     break;
             }
         }
