@@ -9,7 +9,7 @@ public class Platform : MonoBehaviour
 {
 
     [SerializeField] private BoxCollider2D _areaCollider;
-    [SerializeField] private Transform _groundTransform;
+    [SerializeField] private Collider2D _groundCollider;
     
     [FormerlySerializedAs("_possibleDestinations")] public List<PathFindingDestination> PossibleDestinations;
 
@@ -18,8 +18,8 @@ public class Platform : MonoBehaviour
     public float LeftEdge => transform.position.x + AreaCollider.offset.x - GetAreaWidth() / 2f;
     public float RightEdge => transform.position.x + AreaCollider.offset.x + GetAreaWidth() / 2f;
     public float Width => RightEdge - LeftEdge;
-    public Vector3 LeftEdgePosition => new(LeftEdge, _groundTransform.position.y, _groundTransform.position.z);
-    public Vector3 RightEdgePosition => new(RightEdge, _groundTransform.position.y, _groundTransform.position.z);
+    public Vector3 LeftEdgePosition => GetGroundPositionWithX(LeftEdge);
+    public Vector3 RightEdgePosition => GetGroundPositionWithX(RightEdge);
 
     private void OnDrawGizmos()
     {
@@ -38,7 +38,7 @@ public class Platform : MonoBehaviour
             switch (destination.Action)
             {
                 case PathFindingAction.JumpAnywhereUnder:
-                    // DrawArrow.ForGizmos(position, destinationPosition, Color.blue);
+                    DrawArrow.ForGizmos(position, destinationPosition, Color.blue);
                     break;
                 
                 case PathFindingAction.FallFromAnyEdge:
@@ -101,5 +101,12 @@ public class Platform : MonoBehaviour
 
     private float GetAreaWidth() =>
         _areaCollider.size.x * transform.localScale.x;
+
+    private Vector3 GetGroundPositionWithX(float x)
+    {
+        var position = _groundCollider.transform.position + (Vector3)_groundCollider.offset;
+        position.x = x;
+        return position;
+    }
 
 }

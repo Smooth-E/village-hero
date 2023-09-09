@@ -203,7 +203,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _areaCollider: {fileID: 7463173166677780540}
-  _groundTransform: {fileID: 7463173166740790865}
+  _groundCollider: {fileID: 7463173166740790864}
   PossibleDestinations: []
 --- !u!1 &7463173167500316652
 GameObject:
@@ -586,5 +586,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _areaCollider: {fileID: 7463173167666712044}
-  _groundTransform: {fileID: 7463173167678996450}
+  _groundCollider: {fileID: 7463173167678996453}
   PossibleDestinations: []

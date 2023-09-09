@@ -115,28 +115,26 @@ public class PlatformConnectionsDefiner : MonoBehaviour
     {
         var destinations = new List<PathFindingDestination>();
         var maximumHeight = Mathf.Pow(InitialVerticalVelocity, 2) / (VerticalGravityAcceleration * 2);
+        var rightEdge = platform.RightEdgePosition;
+        var leftEdge = platform.LeftEdgePosition;
         
         foreach (var otherPlatform in _platforms)
         {
             if (platform == otherPlatform)
                 continue;
+
+            var otherRightEdge = otherPlatform.RightEdgePosition;
+            var otherLeftEdge = otherPlatform.LeftEdgePosition;
             
-            if (otherPlatform.RightEdgePosition.y < platform.RightEdgePosition.y + maximumHeight)
+            var isHigher = otherRightEdge.y < rightEdge.y + maximumHeight && otherRightEdge.y > rightEdge.y;
+            var intersects = (otherRightEdge.x < rightEdge.x && otherRightEdge.x > leftEdge.x)
+                             || (otherLeftEdge.x < rightEdge.x && otherLeftEdge.x > leftEdge.x);
+            
+            if (isHigher && intersects)
                 destinations.Add(new(otherPlatform, PathFindingAction.JumpAnywhereUnder));
         }
         
         return destinations;
-    }
-
-    private float GetAttitudeAfterJump(
-        float horizontalVelocity, 
-        float verticalVelocity, 
-        Vector3 startPosition, 
-        float desiredX) 
-    {
-        var deltaX = desiredX - startPosition.x;
-        var time = Mathf.Abs(deltaX / horizontalVelocity);
-        return verticalVelocity * time - VerticalGravityAcceleration * Mathf.Pow(time, 2) / 2;
     }
 
     private float GetXForAttitude(
@@ -151,7 +149,7 @@ public class PlatformConnectionsDefiner : MonoBehaviour
         
         var a = VerticalGravityAcceleration / 2;
         var b =  verticalVelocity;
-        var discriminant = b - 4 * a * desiredY;
+        var discriminant = b * b - 4 * a * desiredY;
 
         // Object will never reach the desired attitude
         if (discriminant < 0)
